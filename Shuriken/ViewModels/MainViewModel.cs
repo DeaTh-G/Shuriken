@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Collections.ObjectModel;
 using XNCPLib.XNCP;
+using XNCPLib.SWIF;
 using Shuriken.Models;
 using Shuriken.Commands;
 using System.Windows;
@@ -48,6 +49,19 @@ namespace Shuriken.ViewModels
         /// <param name="filename">The path of the file to load</param>
         public void Load(string filename)
         {
+            string extension = Path.GetExtension(filename);
+            if (extension.ToLower() == ".xncp" || extension.ToLower() == ".yncp")
+            {
+                LoadXNCP(filename);
+            }
+            else if (extension.ToLower() == ".swif")
+            {
+                LoadSWIF(filename);
+            }
+        }
+
+        public void LoadXNCP(string filename)
+        {
             FAPCFile file = new FAPCFile();
             file.Load(filename);
 
@@ -85,7 +99,7 @@ namespace Shuriken.ViewModels
                     {
                         int id = Project.CreateSprite(texList.Textures[textureIndex], subimage.TopLeft.Y, subimage.TopLeft.X,
                             subimage.BottomRight.Y, subimage.BottomRight.X);
-                        
+
                         texList.Textures[textureIndex].Sprites.Add(id);
                     }
                 }
@@ -107,6 +121,64 @@ namespace Shuriken.ViewModels
                 Project.Scenes.Add(new UIScene(xScenes[(int)sceneID.Index], sceneID.Name, texList, Project.Fonts));
 
             Project.TextureLists.Add(texList);
+        }
+
+        public void LoadSWIF(string filename)
+        {
+            SWIFFile file = new SWIFFile();
+            file.Load(filename);
+
+            string root = Path.GetDirectoryName(Path.GetFullPath(filename));
+            List<SWScene> swScenes = file.Content.SurfWaveProject.Project.Scenes;
+            List<SWTextureList> swTextureLists = file.Content.SurfWaveProject.Project.TextureLists;
+            List<SWFontList> swFontLists = file.Content.SurfWaveProject.Project.FontLists;
+
+            Clear();
+
+            foreach (SWFontList fontList in swFontLists)
+            {
+                // Implement Texture List Index and Texture Index too here.
+                UIFont font = new UIFont(fontList.Name.Value);
+                foreach (SWFontMapping fontMap in fontList.FontsMappings)
+                    font.Mappings.Add(new Models.CharacterMapping(Convert.ToChar(fontMap.Character), fontMap.SpriteIndex + 1));
+
+                Project.Fonts.Add(font);
+            }
+
+            foreach (SWTextureList textureList in swTextureLists)
+            {
+                TextureList texList = new TextureList(textureList.Name.Value);
+                foreach (SWTexture texture in textureList.Textures)
+                {
+                    string texPath = Path.Combine(root, texture.Name.Value + ".dds");
+                    if (File.Exists(texPath))
+                    {
+                        Texture tex = new Texture(texPath);
+                        foreach (SWSubImage subimage in texture.SubImages)
+                        {
+                            int id = Project.CreateSprite(tex, subimage.TopLeft.Y, subimage.TopLeft.X,
+                                subimage.BottomRight.Y, subimage.BottomRight.X);
+                            tex.Sprites.Add(id);
+                        }
+
+                        texList.Textures.Add(tex);
+                    }
+                    else
+                    {
+                        MissingTextures.Add(texture.Name.Value);
+                    }
+                }
+
+                Project.TextureLists.Add(texList);
+            }
+
+            foreach (SWScene scene in swScenes)
+            {
+                Project.Scenes.Add(new UIScene(file.Content.SurfWaveProject.Project, scene, scene.Name.Value, Project.TextureLists, Project.Fonts));
+            }
+
+            if (MissingTextures.Count > 0)
+                WarnMissingTextures();
         }
 
         public void Clear()

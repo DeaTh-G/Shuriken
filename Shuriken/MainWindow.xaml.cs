@@ -45,7 +45,9 @@ namespace Shuriken
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Ninja Chao Project Files|*.xncp;*.yncp";
+            fileDialog.Filter = "Ninja Chao Project Files|*.xncp;*.yncp|"
+                              + "Surf Wave Project Files|*.swif|"
+                              + "All Project Files|*.xncp;*.yncp;*.swif";
 
             if (fileDialog.ShowDialog() == true)
             {

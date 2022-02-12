@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XNCPLib.XNCP;
+using XNCPLib.SWIF;
 using System.ComponentModel;
 using Shuriken.Models.Animation;
 using Shuriken.Misc;
@@ -57,6 +58,19 @@ namespace Shuriken.Models
             }
 
             ProcessCasts(scene, texList, fonts);
+            Visible = false;
+        }
+
+        public UIScene(SWProject project, SWScene scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        {
+            Name = sceneName;
+            AspectRatio = scene.FrameSize.X / scene.FrameSize.Y;
+            AnimationFramerate = project.FrameRate;
+            TextureSizes = new ObservableCollection<Vector2>();
+            Animations = new ObservableCollection<AnimationGroup>();
+            Groups = new ObservableCollection<UICastGroup>();
+
+            ProcessSWCasts(scene, texLists, fonts);
             Visible = false;
         }
 
@@ -188,10 +202,58 @@ namespace Shuriken.Models
             }
         }
 
+        private void ProcessSWCasts(SWScene scene, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        {
+            // Create groups
+            for (int g = 0; g < scene.LayerCount; ++g)
+            {
+                Groups.Add(new UICastGroup
+                {
+                    Name = scene.Layers[g].Name.Value,
+                });
+            }
+
+            // process group layers
+            List<UICast> tempCasts = new List<UICast>();
+            for (int g = 0; g < Groups.Count; ++g)
+            {
+                for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
+                {
+                    UICast cast = new UICast(scene.Layers[g].Casts[c], scene.Layers[g].Casts[c].Name.Value, c);
+                    
+                    if (cast.Type == DrawType.Sprite)
+                    {
+                        for (int index = 0; index < scene.Layers[g].Casts[c].CastInfo.PatternInfoCount; ++index)
+                        {
+                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].TextureListIndex);
+                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].TextureMapIndex);
+                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].SpriteIndex);
+                        }
+                    }
+
+
+                    tempCasts.Add(cast);
+                }
+
+                for (int c = 0; c < scene.Layers[g].CastCellCount; c++)
+                {
+                    // build hierarchy tree
+                    CreateHierarchyTree(g, c, scene.Layers[g].Casts[c].ChildIndex, scene.Layers[g].Casts[c].NextIndex, tempCasts);
+                }
+
+                tempCasts.Clear();
+            }
+        }
+
         private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UICast> lyrs)
         {
             Groups[group].Casts.Add(lyrs[0]);
             BuildTree(0, tree, lyrs, null);
+        }
+
+        private void CreateHierarchyTree(int group, int cast, short childIndex, short nextIndex, List<UICast> lyrs)
+        {
+            Groups[group].Casts.Add(lyrs[cast]);
         }
 
         private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UICast> lyrs, UICast parent)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using XNCPLib.XNCP;
+using XNCPLib.SWIF;
 using Shuriken.ViewModels;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -135,6 +136,35 @@ namespace Shuriken.Models
             InfoField30 = cast.CastInfoData.Field30;
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
+
+            Sprites = new ObservableCollection<int>();
+            for (int i = 0; i < 32; ++i)
+                Sprites.Add(-1);
+        }
+
+        public UICast(SWCast cast, string name, int index)
+        {
+            Name = name;
+            Type = (cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
+            IsEnabled = cast.Flags != 0;
+            Visible = true;
+            ZIndex = index;
+            Children = new ObservableCollection<UICast>();
+
+            Flags = cast.Flags;
+
+            Width = (uint)cast.CastInfo.Width;
+            Height = (uint)cast.CastInfo.Height;
+
+            Offset = new Vector2(cast.CastInfo.Field0C, cast.CastInfo.Field10); // Probably?
+
+            Translation = new Vector2();
+            Scale = new Vector2();
+            Color = new Color();
+            GradientTopLeft = new Color(cast.CastInfo.GradientTopLeft.RGBA);
+            GradientBottomLeft = new Color(cast.CastInfo.GradientBottomLeft.RGBA);
+            GradientTopRight = new Color(cast.CastInfo.GradientTopRight.RGBA);
+            GradientBottomRight = new Color(cast.CastInfo.GradientBottomRight.RGBA);
 
             Sprites = new ObservableCollection<int>();
             for (int i = 0; i < 32; ++i)
