@@ -28,7 +28,7 @@ namespace XNCPLib.SWIF
     public class SWCastFontInfo
     {
         public uint Field00 { get; set; }
-        public uint Field04 { get; set; }
+        public int Field04 { get; set; }
         public uint CharacterListOffset { get; set; }
         public Vector2 Scale { get; set; }
         public uint Field14 { get; set; }
@@ -47,7 +47,7 @@ namespace XNCPLib.SWIF
         public void Read(BinaryObjectReader reader)
         {
             Field00 = reader.ReadUInt32();
-            Field04 = reader.ReadUInt32();
+            Field04 = reader.ReadInt32();
             CharacterListOffset = reader.ReadUInt32();
             Scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field14 = reader.ReadUInt32();

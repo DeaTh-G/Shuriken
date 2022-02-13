@@ -230,16 +230,17 @@ namespace Shuriken.Models
                             cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].SpriteIndex);
                         }
                     }
-
+                    else if (cast.Type == DrawType.Font)
+                    {
+                        UIFont font = fonts.ElementAt(scene.Layers[g].Casts[c].CastInfo.FontInfo.Field04);
+                        cast.Font = font;
+                    }
 
                     tempCasts.Add(cast);
                 }
 
-                for (int c = 0; c < scene.Layers[g].CastCellCount; c++)
-                {
-                    // build hierarchy tree
-                    CreateHierarchyTree(g, c, scene.Layers[g].Casts[c].ChildIndex, scene.Layers[g].Casts[c].NextIndex, tempCasts);
-                }
+                // build hierarchy tree
+                CreateHierarchyTree(g, scene.Layers[g].Casts, tempCasts);
 
                 tempCasts.Clear();
             }
@@ -251,9 +252,10 @@ namespace Shuriken.Models
             BuildTree(0, tree, lyrs, null);
         }
 
-        private void CreateHierarchyTree(int group, int cast, short childIndex, short nextIndex, List<UICast> lyrs)
+        private void CreateHierarchyTree(int group, List<SWCast> casts, List<UICast> lyrs)
         {
-            Groups[group].Casts.Add(lyrs[cast]);
+            Groups[group].Casts.Add(lyrs[0]);
+            BuildTree(0, casts, lyrs, null);
         }
 
         private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UICast> lyrs, UICast parent)
@@ -275,6 +277,28 @@ namespace Shuriken.Models
                     parent.Children.Add(sibling);
 
                 BuildTree(siblingIndex, tree, lyrs, parent);
+            }
+        }
+
+        private void BuildTree(int c, List<SWCast> casts, List<UICast> lyrs, UICast parent)
+        {
+            int childIndex = casts[c].ChildIndex;
+            if (childIndex != -1)
+            {
+                UICast child = lyrs[childIndex];
+                lyrs[c].Children.Add(child);
+
+                BuildTree(childIndex, casts, lyrs, lyrs[c]);
+            }
+
+            int siblingIndex = casts[c].NextIndex;
+            if (siblingIndex != -1)
+            {
+                UICast sibling = lyrs[siblingIndex];
+                if (parent != null)
+                    parent.Children.Add(sibling);
+
+                BuildTree(siblingIndex, casts, lyrs, parent);
             }
         }
 
