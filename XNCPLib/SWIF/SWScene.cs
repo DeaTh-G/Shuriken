@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using Amicitia.IO.Binary;
+using Amicitia.IO.Binary.Extensions;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
@@ -56,6 +58,7 @@ namespace XNCPLib.SWIF
             FrameSize = new Vector2(reader.ReadSingle(), reader.ReadSingle());
             Field28 = reader.ReadUInt32();
 
+            reader.PushOffsetOrigin();
             reader.Seek(LayerOffset, SeekOrigin.Begin);
             for (int i = 0; i < LayerCount; i++)
             {
@@ -73,6 +76,9 @@ namespace XNCPLib.SWIF
 
                 Cameras.Add(camera);
             }
+
+            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
+            reader.PopOffsetOrigin();
         }
     }
 }
