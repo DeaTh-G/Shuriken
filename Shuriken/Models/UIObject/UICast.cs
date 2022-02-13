@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using XNCPLib.XNCP;
+using XNCPLib.Misc;
 using XNCPLib.SWIF;
 using Shuriken.ViewModels;
 using System.ComponentModel;
@@ -142,29 +143,65 @@ namespace Shuriken.Models
                 Sprites.Add(-1);
         }
 
-        public UICast(SWCast cast, string name, int index)
+        public UICast(SWCast cast, SWCell cell, System.Numerics.Vector2 framesize, string name, int index)
         {
             Name = name;
             Type = (cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
-            IsEnabled = cast.Flags != 0;
+            Type = (cast.Flags & SWCast.EFlags.eFlags_Enabled) != 0 ? Type : DrawType.None;
+            IsEnabled = true;
             Visible = true;
             ZIndex = index;
             Children = new ObservableCollection<UICast>();
 
-            Flags = cast.Flags;
+            TopLeft = new Vector2();
+            BottomLeft = new Vector2();
+            TopRight = new Vector2();
+            BottomRight = new Vector2();
+
+            Vector2 anchorPoint = new Vector2();
+            anchorPoint.X = (cast.CastInfo.AnchorPoint.X != 0 ? cast.CastInfo.AnchorPoint.X : cast.CastInfo.Width) / framesize.X;
+            anchorPoint.Y = (cast.CastInfo.AnchorPoint.Y != 0 ? cast.CastInfo.AnchorPoint.Y : cast.CastInfo.Height) / framesize.Y;
+            if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_AnchorRight) == SWCastInfo.EFlags.eFlags_AnchorRight)
+            {
+                TopRight = new Vector2(anchorPoint.X, 0);
+                BottomRight = new Vector2(anchorPoint.X, 0);
+            }
+            else if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_AnchorLeft) == SWCastInfo.EFlags.eFlags_AnchorLeft)
+            {
+                TopLeft = new Vector2(anchorPoint.X, 0);
+                BottomLeft = new Vector2(anchorPoint.X, 0);
+            }
+            else if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_AnchorTopRight) == SWCastInfo.EFlags.eFlags_AnchorTopRight)
+            {
+                TopRight = new Vector2(anchorPoint.X, anchorPoint.Y);
+            }
+            else if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_AnchorTopLeft) == SWCastInfo.EFlags.eFlags_AnchorTopLeft)
+            {
+                TopLeft = new Vector2(anchorPoint.X, 0);
+                TopRight = new Vector2(0, anchorPoint.Y);
+            }
+
+            //Flags = (uint)cast.Flags;
+
+            Font = null;
+            FontCharacters = cast.CastInfo.FontInfo.Characters;
 
             Width = (uint)cast.CastInfo.Width;
             Height = (uint)cast.CastInfo.Height;
-
-            Offset = new Vector2(cast.CastInfo.Field0C, cast.CastInfo.Field10); // Probably?
+            
+            Offset = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
 
             Translation = new Vector2();
-            Scale = new Vector2();
-            Color = new Color();
-            GradientTopLeft = new Color(cast.CastInfo.GradientTopLeft.RGBA);
-            GradientBottomLeft = new Color(cast.CastInfo.GradientBottomLeft.RGBA);
-            GradientTopRight = new Color(cast.CastInfo.GradientTopRight.RGBA);
-            GradientBottomRight = new Color(cast.CastInfo.GradientBottomRight.RGBA);
+            if (index == 0)
+                Translation = new Vector2(0.5f, 0.5f);
+
+            Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;
+            Scale = new Vector2(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y);
+            Color = new Color(Utilities.ReverseColor(cell.Color));
+            GradientTopLeft = new Color(Utilities.ReverseColor(cast.CastInfo.GradientTopLeft));
+            GradientBottomLeft = new Color(Utilities.ReverseColor(cast.CastInfo.GradientBottomLeft));
+            GradientTopRight = new Color(Utilities.ReverseColor(cast.CastInfo.GradientTopRight));
+            GradientBottomRight = new Color(Utilities.ReverseColor(cast.CastInfo.GradientBottomRight));
 
             Sprites = new ObservableCollection<int>();
             for (int i = 0; i < 32; ++i)

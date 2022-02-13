@@ -66,7 +66,7 @@ namespace XNCPLib.SWIF
                 Casts.Add(cast);
             }
 
-            reader.Seek(CastOffset, SeekOrigin.Begin);
+            reader.Seek(CellOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCellCount; i++)
             {
                 SWCell cell = new SWCell();

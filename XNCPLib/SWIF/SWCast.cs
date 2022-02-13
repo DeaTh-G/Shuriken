@@ -12,9 +12,14 @@ namespace XNCPLib.SWIF
 {
     public class SWCast
     {
+        public enum EFlags
+        {
+            eFlags_Enabled = 1,
+        }
+
         public StringOffset Name { get; set; }
         public int ID { get; set; }
-        public uint Flags { get; set; }
+        public EFlags Flags { get; set; }
         public uint CastInfoOffset { get; set; }
         public short ChildIndex { get; set; }
         public short NextIndex { get; set; }
@@ -31,7 +36,7 @@ namespace XNCPLib.SWIF
         {
             Name.Read(reader);
             ID = reader.ReadInt32();
-            Flags = reader.ReadUInt32();
+            Flags = (EFlags)reader.ReadUInt32();
 
             CastInfoOffset = reader.ReadUInt32();
             ChildIndex = reader.ReadInt16();

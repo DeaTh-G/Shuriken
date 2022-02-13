@@ -36,12 +36,11 @@ namespace XNCPLib.SWIF
         public short Field1C { get; set; }
         public ushort Field1E { get; set; }
         public uint Field20 { get; set; } // TODO: What is this an Offset To (It points to the end of the font table)
-        public List<char> Characters { get; set; }
+        public string Characters { get; set; }
 
         public SWCastFontInfo()
         {
             Scale = new Vector2(1.0f, 1.0f);
-            Characters = new List<char>();
         }
     
         public void Read(BinaryObjectReader reader)
@@ -58,10 +57,7 @@ namespace XNCPLib.SWIF
 
             reader.PushOffsetOrigin();
             reader.Seek(CharacterListOffset, SeekOrigin.Begin);
-            for (int i = 0; i < 4; i++)
-            {
-                Characters.Add(Convert.ToChar(reader.ReadByte()));
-            }
+            Characters = reader.ReadString(StringBinaryFormat.NullTerminated);
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
@@ -95,12 +91,11 @@ namespace XNCPLib.SWIF
         public EFlags Flags { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
-        public float Field0C { get; set; }
-        public float Field10 { get; set; }
-        public SWColor GradientTopLeft { get; set; }
-        public SWColor GradientBottomLeft { get; set; }
-        public SWColor GradientTopRight { get; set; }
-        public SWColor GradientBottomRight { get; set; }
+        public Vector2 AnchorPoint { get; set; }
+        public uint GradientTopLeft { get; set; }
+        public uint GradientBottomLeft { get; set; }
+        public uint GradientTopRight { get; set; }
+        public uint GradientBottomRight { get; set; }
         public short Field24 { get; set; }
         public short Field26 { get; set; }
         public ushort PatternInfoCount { get; set; }
@@ -115,12 +110,9 @@ namespace XNCPLib.SWIF
 
         public SWCastInfo()
         {
-            GradientTopLeft = new SWColor();
-            GradientBottomLeft = new SWColor();
-            GradientTopRight = new SWColor();
-            GradientBottomRight = new SWColor();
             PatternInfoList = new List<SWCastPatternInfo>();
             FontInfo = new SWCastFontInfo();
+            AnchorPoint = new Vector2();
         }
 
         public void Read(BinaryObjectReader reader)
@@ -128,13 +120,12 @@ namespace XNCPLib.SWIF
             Flags = (EFlags)reader.ReadUInt32();
             Width = reader.ReadSingle();
             Height = reader.ReadSingle();
-            Field0C = reader.ReadSingle();
-            Field10 = reader.ReadSingle();
+            AnchorPoint = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-            GradientTopLeft = new SWColor(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-            GradientBottomLeft = new SWColor(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-            GradientTopRight = new SWColor(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
-            GradientBottomRight = new SWColor(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte());
+            GradientTopLeft = reader.ReadUInt32();
+            GradientBottomLeft = reader.ReadUInt32();
+            GradientTopRight = reader.ReadUInt32();
+            GradientBottomRight = reader.ReadUInt32();
 
             Field24 = reader.ReadInt16();
             Field26 = reader.ReadInt16();

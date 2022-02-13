@@ -219,7 +219,8 @@ namespace Shuriken.Models
             {
                 for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
                 {
-                    UICast cast = new UICast(scene.Layers[g].Casts[c], scene.Layers[g].Casts[c].Name.Value, c);
+                    UICast cast = new UICast(scene.Layers[g].Casts[c], scene.Layers[g].Cells[c],
+                        scene.FrameSize, scene.Layers[g].Casts[c].Name.Value, c);
                     
                     if (cast.Type == DrawType.Sprite)
                     {
@@ -254,8 +255,14 @@ namespace Shuriken.Models
 
         private void CreateHierarchyTree(int group, List<SWCast> casts, List<UICast> lyrs)
         {
-            Groups[group].Casts.Add(lyrs[0]);
-            BuildTree(0, casts, lyrs, null);
+            int next = 0;
+            while (next != -1)
+            {
+                Groups[group].Casts.Add(lyrs[next]);
+                BuildTree(next, casts, lyrs, null);
+
+                next = casts[next].NextIndex;
+            }
         }
 
         private void BuildTree(int c, List<CastHierarchyTreeNode> tree, List<UICast> lyrs, UICast parent)

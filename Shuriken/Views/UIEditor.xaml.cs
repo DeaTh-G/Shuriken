@@ -308,13 +308,13 @@ namespace Shuriken.Views
                 var spr = Project.TryGetSprite(sprID);
                 if (spr != null)
                 {
-                    xOffset += spr.Width / 2.1f * sz.X;
+                    xOffset += spr.Width / 2.0f * sz.X;
                     Vec2 sprPos = new Vec2(pos.X + xOffset - (lyr.Width / 2.0f * sz.X), pos.Y);
 
                     renderer.DrawSprite(sprPos, pivot, rot, new System.Numerics.Vector2(sz.X * spr.Width, sz.Y * spr.Height), spr, lyr.Flags, lyr.Color.ToFloats(),
                         gradients[0].ToFloats(), gradients[2].ToFloats(), gradients[3].ToFloats(), gradients[1].ToFloats(), lyr.ZIndex);
 
-                    xOffset += spr.Width / 2.25f * sz.X;
+                    xOffset += spr.Width / 9.0f * sz.X;
                 }
             }
         }
