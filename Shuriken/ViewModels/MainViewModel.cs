@@ -135,16 +135,6 @@ namespace Shuriken.ViewModels
 
             Clear();
 
-            foreach (SWFontList fontList in swFontLists)
-            {
-                // Implement Texture List Index and Texture Index too here.
-                UIFont font = new UIFont(fontList.Name.Value);
-                foreach (SWFontMapping fontMap in fontList.FontsMappings)
-                    font.Mappings.Add(new Models.CharacterMapping(Convert.ToChar(fontMap.Character), fontMap.SpriteIndex + 1));
-
-                Project.Fonts.Add(font);
-            }
-
             foreach (SWTextureList textureList in swTextureLists)
             {
                 TextureList texList = new TextureList(textureList.Name.Value);
@@ -170,6 +160,21 @@ namespace Shuriken.ViewModels
                 }
 
                 Project.TextureLists.Add(texList);
+            }
+
+            foreach (SWFontList fontList in swFontLists)
+            {
+                // Implement Texture List Index and Texture Index too here.
+                UIFont font = new UIFont(fontList.Name.Value);
+                for (int index = 0; index < fontList.FontMappingCount; ++index)
+                {
+                    TextureList texList = Project.TextureLists.ElementAt(fontList.FontMappings[index].TextureListIndex);
+                    Texture texture = texList.Textures.ElementAt(fontList.FontMappings[index].TextureMapIndex);
+                    var sprite = texture.Sprites.ElementAt(fontList.FontMappings[index].SpriteIndex);
+                    font.Mappings.Add(new Models.CharacterMapping(Convert.ToChar(fontList.FontMappings[index].Character), sprite));
+                }
+
+                Project.Fonts.Add(font);
             }
 
             foreach (SWScene scene in swScenes)

@@ -15,17 +15,17 @@ namespace XNCPLib.SWIF
         public StringOffset Name { get; set; }
         public uint Field04 { get; set; }
         public uint Field08 { get; set; }
-        public ushort FontCount { get; set; }
+        public ushort FontMappingCount { get; set; }
         public ushort Field0E { get; set; }
-        public uint FontOffset { get; set; }
+        public uint FontMappingOffset { get; set; }
         public uint Field14 { get; set; }
         public uint Field18 { get; set; }
-        public List<SWFontMapping> FontsMappings { get; set; }
+        public List<SWFontMapping> FontMappings { get; set; }
 
         public SWFontList()
         {
             Name = new StringOffset();
-            FontsMappings = new List<SWFontMapping>();
+            FontMappings = new List<SWFontMapping>();
         }
 
         public void Read(BinaryObjectReader reader)
@@ -34,21 +34,21 @@ namespace XNCPLib.SWIF
             Field04 = reader.ReadUInt32();
             Field08 = reader.ReadUInt32();
 
-            FontCount = reader.ReadUInt16();
+            FontMappingCount = reader.ReadUInt16();
             Field0E = reader.ReadUInt16();
-            FontOffset = reader.ReadUInt32();
+            FontMappingOffset = reader.ReadUInt32();
 
             Field14 = reader.ReadUInt32();
             Field18 = reader.ReadUInt32();
 
             reader.PushOffsetOrigin();
-            reader.Seek(FontOffset, SeekOrigin.Begin);
-            for (int i = 0; i < FontCount; i++)
+            reader.Seek(FontMappingOffset, SeekOrigin.Begin);
+            for (int i = 0; i < FontMappingCount; i++)
             {
                 SWFontMapping fontMap = new SWFontMapping();
                 fontMap.Read(reader);
 
-                FontsMappings.Add(fontMap);
+                FontMappings.Add(fontMap);
             }
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);

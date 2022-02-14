@@ -11,14 +11,14 @@ namespace XNCPLib.SWIF
     {
         public ushort Character { get; set; }
         public short TextureListIndex { get; set; }
-        public short TextureIndex { get; set; }
+        public short TextureMapIndex { get; set; }
         public short SpriteIndex { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
             Character = reader.ReadUInt16();
             TextureListIndex = reader.ReadInt16();
-            TextureIndex = reader.ReadInt16();
+            TextureMapIndex = reader.ReadInt16();
             SpriteIndex = reader.ReadInt16();
         }
     }
