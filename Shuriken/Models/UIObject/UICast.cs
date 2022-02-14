@@ -188,7 +188,7 @@ namespace Shuriken.Models
 
             Width = (uint)cast.CastInfo.Width;
             Height = (uint)cast.CastInfo.Height;
-            
+
             Offset = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
 
             Translation = new Vector2();
@@ -196,7 +196,28 @@ namespace Shuriken.Models
                 Translation = new Vector2(0.5f, 0.5f);
 
             Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;
+            if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_RotateLeft) == SWCastInfo.EFlags.eFlags_RotateLeft)
+            {
+                Width = (uint)cast.CastInfo.Height;
+                Height = (uint)cast.CastInfo.Width;
+                Rotation += 90;
+            }
+
             Scale = new Vector2(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y);
+            if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_FlipHorizontally) == SWCastInfo.EFlags.eFlags_FlipHorizontally)
+            {
+                Scale.X = -Scale.X;
+            }
+            else if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_FlipVertically) == SWCastInfo.EFlags.eFlags_FlipVertically)
+            {
+                Scale.Y = -Scale.Y;
+            }
+            else if ((cast.CastInfo.Flags & SWCastInfo.EFlags.eFlags_FlipHorizontallyAndVertically) == SWCastInfo.EFlags.eFlags_FlipHorizontallyAndVertically)
+            {
+                Scale.X = -Scale.X;
+                Scale.Y = -Scale.Y;
+            }
+
             Color = new Color(Utilities.ReverseColor(cell.Color));
             GradientTopLeft = new Color(Utilities.ReverseColor(cast.CastInfo.GradientTopLeft));
             GradientBottomLeft = new Color(Utilities.ReverseColor(cast.CastInfo.GradientBottomLeft));
