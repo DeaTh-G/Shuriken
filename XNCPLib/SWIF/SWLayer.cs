@@ -70,7 +70,7 @@ namespace XNCPLib.SWIF
             for (int i = 0; i < CastCellCount; i++)
             {
                 SWCell cell = new SWCell();
-                cell.Read(reader);
+                cell.Read(reader, Flags);
 
                 Cells.Add(cell);
             }

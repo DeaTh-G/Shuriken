@@ -5,14 +5,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using Amicitia.IO.Binary;
+using System.Runtime.InteropServices;
 
 namespace XNCPLib.SWIF
 {
+    [StructLayout(LayoutKind.Explicit)]
+    public struct SWCellInfoField
+    {
+        [FieldOffset(0)] public uint integer;
+        [FieldOffset(0)] public float single;
+
+        public SWCellInfoField(uint value) : this() { integer = value; }
+    }
+
     public class SWCellInfo
     {
         public Vector3 Position { get; set; }
-        public uint Field0C { get; set; }
-        public uint Field10 { get; set; }
+        public SWCellInfoField Field0C { get; set; }
+        public SWCellInfoField Field10 { get; set; }
         public ushort Rotation { get; set; }
         public ushort Field16 { get; set; }
         public Vector3 Scale { get; set; }
@@ -21,16 +31,21 @@ namespace XNCPLib.SWIF
         {
             Position = new Vector3(0.0f, 0.0f, 0.0f);
             Scale = new Vector3(1.0f, 1.0f, 1.0f);
+
+            Field0C = new SWCellInfoField();
+            Field10 = new SWCellInfoField();
         }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, SWLayer.EFlags layerFlags)
         {
             Position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            Field0C = reader.ReadUInt32();
-            Field10 = reader.ReadUInt32();
+            Field0C = new SWCellInfoField(reader.ReadUInt32());
+            Field10 = new SWCellInfoField(reader.ReadUInt32());
             Rotation = reader.ReadUInt16();
             Field16 = reader.ReadUInt16();
-            Scale = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+
+            if (((int)layerFlags) != 0x100)
+                Scale = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
         }
     }
 
@@ -52,7 +67,7 @@ namespace XNCPLib.SWIF
             CellInfo = new SWCellInfo();
         }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, SWLayer.EFlags layerFlags)
         {
             Color = reader.ReadUInt32();
             Field04 = reader.ReadByte();
@@ -63,7 +78,7 @@ namespace XNCPLib.SWIF
             Field09 = reader.ReadByte();
             Field0A = reader.ReadByte();
             Field0B = reader.ReadByte();
-            CellInfo.Read(reader);
+            CellInfo.Read(reader, layerFlags);
         }
     }
 }
