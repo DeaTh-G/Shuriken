@@ -11,61 +11,67 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWCastPatternInfo
+    public class SWImageCast
     {
-        public ushort TextureListIndex { get; set; }
-        public ushort TextureMapIndex { get; set; }
-        public ushort SpriteIndex { get; set; }
-
-        public void Read(BinaryObjectReader reader)
+        public class SWPatternInfo
         {
-            TextureListIndex = reader.ReadUInt16();
-            TextureMapIndex = reader.ReadUInt16();
-            SpriteIndex = reader.ReadUInt16();
+            public ushort TextureListIndex { get; set; }
+            public ushort TextureMapIndex { get; set; }
+            public ushort SpriteIndex { get; set; }
+
+            public void Read(BinaryObjectReader reader)
+            {
+                TextureListIndex = reader.ReadUInt16();
+                TextureMapIndex = reader.ReadUInt16();
+                SpriteIndex = reader.ReadUInt16();
+            }
         }
-    }
 
-    public class SWCastFontInfo
-    {
-        public uint Field00 { get; set; }
-        public int Field04 { get; set; }
-        public uint CharacterListOffset { get; set; }
-        public Vector2 Scale { get; set; }
-        public uint Field14 { get; set; }
-        public uint Field18 { get; set; }
-        public short Field1C { get; set; }
-        public ushort Field1E { get; set; }
-        public uint Field20 { get; set; } // TODO: What is this an Offset To (It points to the end of the font table)
-        public string Characters { get; set; }
-
-        public SWCastFontInfo()
+        public class SWFontInfo
         {
-            Scale = new Vector2(1.0f, 1.0f);
+            public uint Field00 { get; set; }
+            public uint FontListIndex { get; set; }
+            public uint CharacterListOffset { get; set; }
+            public Vector2 Scale { get; set; }
+            public uint Field14 { get; set; }
+            public uint Field18 { get; set; }
+            public short FontSpacing { get; set; }
+            public ushort Field1E { get; set; }
+            public uint FontListOffset { get; set; } 
+            public string Characters { get; set; }
+            public SWFontList FontList { get; set; }
+
+            public SWFontInfo()
+            {
+                Scale = new Vector2(1.0f, 1.0f);
+                FontList = new SWFontList();
+            }
+
+            public void Read(BinaryObjectReader reader)
+            {
+                Field00 = reader.ReadUInt32();
+                FontListIndex = reader.ReadUInt32();
+                CharacterListOffset = reader.ReadUInt32();
+                Scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                Field14 = reader.ReadUInt32();
+                Field18 = reader.ReadUInt32();
+                FontSpacing = reader.ReadInt16();
+                Field1E = reader.ReadUInt16();
+                FontListOffset = reader.ReadUInt32();
+
+                reader.PushOffsetOrigin();
+
+                reader.Seek(FontListOffset, SeekOrigin.Begin);
+                FontList.Read(reader);
+
+                reader.Seek(CharacterListOffset, SeekOrigin.Begin);
+                Characters = reader.ReadString(StringBinaryFormat.NullTerminated);
+
+                reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
+                reader.PopOffsetOrigin();
+            }
         }
-    
-        public void Read(BinaryObjectReader reader)
-        {
-            Field00 = reader.ReadUInt32();
-            Field04 = reader.ReadInt32();
-            CharacterListOffset = reader.ReadUInt32();
-            Scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-            Field14 = reader.ReadUInt32();
-            Field18 = reader.ReadUInt32();
-            Field1C = reader.ReadInt16();
-            Field1E = reader.ReadUInt16();
-            Field20 = reader.ReadUInt32();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(CharacterListOffset, SeekOrigin.Begin);
-            Characters = reader.ReadString(StringBinaryFormat.NullTerminated);
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
-        }
-    }
-
-    public class SWCastInfo
-    {
         public enum EFlags
         {
             eFlags_Transparent = 1,
@@ -105,13 +111,13 @@ namespace XNCPLib.SWIF
         public uint FontInfoOffset { get; set; }
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
-        public List<SWCastPatternInfo> PatternInfoList { get; set; }
-        public SWCastFontInfo FontInfo { get; set; }
+        public List<SWPatternInfo> PatternInfoList { get; set; }
+        public SWFontInfo FontInfo { get; set; }
 
-        public SWCastInfo()
+        public SWImageCast()
         {
-            PatternInfoList = new List<SWCastPatternInfo>();
-            FontInfo = new SWCastFontInfo();
+            PatternInfoList = new List<SWPatternInfo>();
+            FontInfo = new SWFontInfo();
             AnchorPoint = new Vector2();
         }
 
@@ -143,7 +149,7 @@ namespace XNCPLib.SWIF
             reader.Seek(PatternInfoOffset, SeekOrigin.Begin);
             for (int i = 0; i < PatternInfoCount; i++)
             {
-                SWCastPatternInfo patternInfo = new SWCastPatternInfo();
+                SWPatternInfo patternInfo = new SWPatternInfo();
                 patternInfo.Read(reader);
 
                 PatternInfoList.Add(patternInfo);

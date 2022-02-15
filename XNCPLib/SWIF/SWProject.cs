@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
     public class SWProject
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public ushort SceneCount { get; set; }
         public ushort Field06 { get; set; }
         public ushort TextureListCount { get; set; }
@@ -29,7 +30,6 @@ namespace XNCPLib.SWIF
 
         public SWProject()
         {
-            Name = new StringOffset();
             Camera = new SWCamera();
             Scenes = new List<SWScene>();
             TextureLists = new List<SWTextureList>();
@@ -38,7 +38,8 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
 
             SceneCount = reader.ReadUInt16();
             Field06 = reader.ReadUInt16();

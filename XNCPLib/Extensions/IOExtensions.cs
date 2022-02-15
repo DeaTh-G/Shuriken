@@ -28,5 +28,18 @@ namespace XNCPLib.Extensions
             
             return result;
         }
+        public static string ReadAbsoluteStringOffset(this BinaryObjectReader reader, long offset)
+        {
+            if (offset == 0)
+                return "";
+
+            long savedPosition = reader.Position;
+            reader.Seek(offset, SeekOrigin.Begin);
+
+            string result = reader.ReadString(StringBinaryFormat.NullTerminated);
+            reader.Seek(savedPosition, SeekOrigin.Begin);
+
+            return result;
+        }
     }
 }

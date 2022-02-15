@@ -12,7 +12,7 @@ namespace XNCPLib.SWIF
 {
     public class SWTextureList
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint TextureCount { get; set; }
         public uint TextureOffset { get; set; }
         public uint UserDataOffset { get; set; }
@@ -20,13 +20,13 @@ namespace XNCPLib.SWIF
 
         public SWTextureList()
         {
-            Name = new StringOffset();
             Textures = new List<SWTexture>();
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
 
             TextureCount = reader.ReadUInt32();
             TextureOffset = reader.ReadUInt32();

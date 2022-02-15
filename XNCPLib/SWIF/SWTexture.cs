@@ -12,7 +12,7 @@ namespace XNCPLib.SWIF
 {
     public class SWTexture
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint ID { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
@@ -24,13 +24,14 @@ namespace XNCPLib.SWIF
 
         public SWTexture()
         {
-            Name = new StringOffset();
             SubImages = new List<SWSubImage>();
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+
             ID = reader.ReadUInt32();
             Width = reader.ReadUInt16();
             Height = reader.ReadUInt16();

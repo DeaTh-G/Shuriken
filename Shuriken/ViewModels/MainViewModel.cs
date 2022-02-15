@@ -137,10 +137,10 @@ namespace Shuriken.ViewModels
 
             foreach (SWTextureList textureList in swTextureLists)
             {
-                TextureList texList = new TextureList(textureList.Name.Value);
+                TextureList texList = new TextureList(textureList.Name);
                 foreach (SWTexture texture in textureList.Textures)
                 {
-                    string texPath = Path.Combine(root, texture.Name.Value + ".dds");
+                    string texPath = Path.Combine(root, texture.Name + ".dds");
                     if (File.Exists(texPath))
                     {
                         Texture tex = new Texture(texPath);
@@ -155,7 +155,7 @@ namespace Shuriken.ViewModels
                     }
                     else
                     {
-                        MissingTextures.Add(texture.Name.Value);
+                        MissingTextures.Add(texture.Name);
                     }
                 }
 
@@ -165,7 +165,7 @@ namespace Shuriken.ViewModels
             foreach (SWFontList fontList in swFontLists)
             {
                 // Implement Texture List Index and Texture Index too here.
-                UIFont font = new UIFont(fontList.Name.Value);
+                UIFont font = new UIFont(fontList.Name);
                 for (int index = 0; index < fontList.FontMappingCount; ++index)
                 {
                     TextureList texList = Project.TextureLists.ElementAt(fontList.FontMappings[index].TextureListIndex);
@@ -179,7 +179,7 @@ namespace Shuriken.ViewModels
 
             foreach (SWScene scene in swScenes)
             {
-                Project.Scenes.Add(new UIScene(file.Content.SurfWaveProject.Project, scene, scene.Name.Value, Project.TextureLists, Project.Fonts));
+                Project.Scenes.Add(new UIScene(file.Content.SurfWaveProject.Project, scene, scene.Name, Project.TextureLists, Project.Fonts));
             }
 
             if (MissingTextures.Count > 0)

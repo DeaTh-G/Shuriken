@@ -12,7 +12,7 @@ namespace XNCPLib.SWIF.Animation
 {
     public class SWAnimation
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint ID { get; set; }
         public uint AnimationLinkCount { get; set; }
         public uint Field0C { get; set; }
@@ -26,12 +26,13 @@ namespace XNCPLib.SWIF.Animation
 
         public SWAnimation()
         {
-            Name = new StringOffset();
             AnimationLinks = new List<SWAnimationLink>();
         }
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+
             ID = reader.ReadUInt32();
 
             AnimationLinkCount = reader.ReadUInt32();

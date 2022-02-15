@@ -18,7 +18,7 @@ namespace XNCPLib.SWIF
             eFlags_Hidden = 1
         }
 
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint ID { get; set; }
         public EFlags Flags { get; set; }
         public uint LayerCount { get; set; }
@@ -34,7 +34,6 @@ namespace XNCPLib.SWIF
 
         public SWScene()
         {
-            Name = new StringOffset();
             FrameSize = new Vector2(1280, 720);
             Layers = new List<SWLayer>();
             Cameras = new List<SWCamera>();
@@ -42,7 +41,8 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
             ID = reader.ReadUInt32();
             Flags = (EFlags)reader.ReadUInt32();
 

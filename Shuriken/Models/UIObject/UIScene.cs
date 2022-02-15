@@ -209,7 +209,7 @@ namespace Shuriken.Models
             {
                 Groups.Add(new UICastGroup
                 {
-                    Name = scene.Layers[g].Name.Value,
+                    Name = scene.Layers[g].Name,
                 });
             }
 
@@ -220,20 +220,20 @@ namespace Shuriken.Models
                 for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
                 {
                     UICast cast = new UICast(scene.Layers[g].Casts[c], scene.Layers[g].Cells[c],
-                        scene.FrameSize, scene.Layers[g].Casts[c].Name.Value, c);
+                        scene.FrameSize, scene.Layers[g].Casts[c].Name, c);
                     
                     if (cast.Type == DrawType.Sprite)
                     {
-                        for (int index = 0; index < scene.Layers[g].Casts[c].CastInfo.PatternInfoCount; ++index)
+                        for (int index = 0; index < scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoCount; ++index)
                         {
-                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].TextureListIndex);
-                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].TextureMapIndex);
-                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].CastInfo.PatternInfoList[index].SpriteIndex);
+                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].TextureListIndex);
+                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].TextureMapIndex);
+                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].SpriteIndex);
                         }
                     }
                     else if (cast.Type == DrawType.Font)
                     {
-                        UIFont font = fonts.ElementAt(scene.Layers[g].Casts[c].CastInfo.FontInfo.Field04);
+                        UIFont font = fonts.ElementAt((int)scene.Layers[g].Casts[c].Cast.ImageCast.FontInfo.FontListIndex);
                         cast.Font = font;
                     }
 
@@ -253,7 +253,7 @@ namespace Shuriken.Models
             BuildTree(0, tree, lyrs, null);
         }
 
-        private void CreateHierarchyTree(int group, List<SWCast> casts, List<UICast> lyrs)
+        private void CreateHierarchyTree(int group, List<SWCastNode> casts, List<UICast> lyrs)
         {
             int next = 0;
             while (next != -1)
@@ -287,7 +287,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void BuildTree(int c, List<SWCast> casts, List<UICast> lyrs, UICast parent)
+        private void BuildTree(int c, List<SWCastNode> casts, List<UICast> lyrs, UICast parent)
         {
             int childIndex = casts[c].ChildIndex;
             if (childIndex != -1)

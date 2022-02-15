@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using Amicitia.IO.Binary;
+using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
     public class SWCamera
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint ID;
         public Vector3 Position { get; set; }
         public Vector3 LookAt { get; set; }
@@ -22,14 +23,14 @@ namespace XNCPLib.SWIF
 
         public SWCamera()
         {
-            Name = new StringOffset();
             Position = new Vector3(0.0f, 1.0f, 0.0f);
             LookAt = new Vector3(0.0f, 1.0f, 0.0f);
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
             ID = reader.ReadUInt32();
 
             Position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());

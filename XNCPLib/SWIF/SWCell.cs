@@ -36,7 +36,7 @@ namespace XNCPLib.SWIF
             Field10 = new SWCellInfoField();
         }
 
-        public void Read(BinaryObjectReader reader, SWLayer.EFlags layerFlags)
+        public void Read(BinaryObjectReader reader)
         {
             Position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             Field0C = new SWCellInfoField(reader.ReadUInt32());
@@ -44,7 +44,7 @@ namespace XNCPLib.SWIF
             Rotation = reader.ReadUInt16();
             Field16 = reader.ReadUInt16();
 
-            if (((int)layerFlags) != 0x100)
+            if (Field16 == 0)
                 Scale = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
         }
     }
@@ -67,7 +67,7 @@ namespace XNCPLib.SWIF
             CellInfo = new SWCellInfo();
         }
 
-        public void Read(BinaryObjectReader reader, SWLayer.EFlags layerFlags)
+        public void Read(BinaryObjectReader reader)
         {
             Color = reader.ReadUInt32();
             Field04 = reader.ReadByte();
@@ -78,7 +78,7 @@ namespace XNCPLib.SWIF
             Field09 = reader.ReadByte();
             Field0A = reader.ReadByte();
             Field0B = reader.ReadByte();
-            CellInfo.Read(reader, layerFlags);
+            CellInfo.Read(reader);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace XNCPLib.SWIF
             eFlags_Enabled = 1
         }
 
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint ID { get; set; }
         public EFlags Flags { get; set; }
         public uint CastCellCount { get; set; }
@@ -28,21 +28,21 @@ namespace XNCPLib.SWIF
         public uint AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public List<SWCast> Casts { get; set; }
+        public List<SWCastNode> Casts { get; set; }
         public List<SWCell> Cells { get; set; }
         public List<SWAnimation> Animations { get; set; }
 
         public SWLayer()
         {
-            Name = new StringOffset();
-            Casts = new List<SWCast>();
+            Casts = new List<SWCastNode>();
             Cells = new List<SWCell>();
             Animations = new List<SWAnimation>();
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
             ID = reader.ReadUInt32();
             Flags = (EFlags)reader.ReadUInt32();
 
@@ -60,7 +60,7 @@ namespace XNCPLib.SWIF
             reader.Seek(CastOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCellCount; i++)
             {
-                SWCast cast = new SWCast();
+                SWCastNode cast = new SWCastNode();
                 cast.Read(reader);
 
                 Casts.Add(cast);
@@ -70,7 +70,7 @@ namespace XNCPLib.SWIF
             for (int i = 0; i < CastCellCount; i++)
             {
                 SWCell cell = new SWCell();
-                cell.Read(reader, Flags);
+                cell.Read(reader);
 
                 Cells.Add(cell);
             }

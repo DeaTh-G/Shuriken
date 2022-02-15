@@ -12,7 +12,7 @@ namespace XNCPLib.SWIF
 {
     public class SWFontList
     {
-        public StringOffset Name { get; set; }
+        public string Name { get; set; }
         public uint Field04 { get; set; }
         public uint Field08 { get; set; }
         public ushort FontMappingCount { get; set; }
@@ -24,13 +24,13 @@ namespace XNCPLib.SWIF
 
         public SWFontList()
         {
-            Name = new StringOffset();
             FontMappings = new List<SWFontMapping>();
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            Name.Read(reader);
+            uint nameOffset = reader.ReadUInt32();
+            Name = reader.ReadAbsoluteStringOffset(nameOffset);
             Field04 = reader.ReadUInt32();
             Field08 = reader.ReadUInt32();
 
