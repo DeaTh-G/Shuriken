@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
@@ -20,8 +18,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
             Field04 = reader.Read<uint>();
             Field08 = reader.Read<uint>();
 
@@ -32,13 +29,11 @@ namespace XNCPLib.SWIF
             Field14 = reader.Read<uint>();
             Field18 = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(FontMappingOffset, SeekOrigin.Begin);
-            for (int i = 0; i < FontMappingCount; i++)
-                FontMappings.Add(reader.ReadObject<SWFontMapping>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(FontMappingOffset, () =>
+            {
+                for (int i = 0; i < FontMappingCount; i++)
+                    FontMappings.Add(reader.ReadObject<SWFontMapping>());
+            }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }

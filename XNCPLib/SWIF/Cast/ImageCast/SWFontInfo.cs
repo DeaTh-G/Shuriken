@@ -32,15 +32,8 @@ namespace XNCPLib.SWIF.Cast.ImageCast
             Field1E = reader.Read<ushort>();
             FontListOffset = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(FontListOffset, SeekOrigin.Begin);
-            FontList = reader.ReadObject<SWFontList>();
-
-            reader.Seek(CharacterListOffset, SeekOrigin.Begin);
-            Characters = reader.ReadString(StringBinaryFormat.NullTerminated);
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(FontListOffset, () => { FontList = reader.ReadObject<SWFontList>(); }, true);
+            reader.ReadAtOffset(CharacterListOffset, () => { Characters = reader.ReadString(StringBinaryFormat.NullTerminated); }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }

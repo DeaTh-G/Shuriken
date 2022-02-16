@@ -11,7 +11,7 @@ namespace XNCPLib.SWIF
         public ChunkHeader Header { get; set; } = new();
         public uint ProjectNodeOffset { get; set; }
         public uint Field0C { get; set; }
-        public SWProject Project { get; set; } = new();
+        public SWProjectNode ProjectNode { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -21,8 +21,7 @@ namespace XNCPLib.SWIF
             ProjectNodeOffset = reader.Read<uint>();
             Field0C = reader.Read<uint>();
 
-            reader.Seek(reader.GetOffsetOrigin() - 8 + ProjectNodeOffset, SeekOrigin.Begin);
-            Project = reader.ReadObject<SWProject>();
+            reader.ReadAtOffset(ProjectNodeOffset - 8, () => { ProjectNode = reader.ReadObject<SWProjectNode>(); });
 
             reader.Seek(reader.GetOffsetOrigin() + Header.Size, SeekOrigin.Begin);
             reader.PopOffsetOrigin();

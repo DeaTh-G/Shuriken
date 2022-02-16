@@ -18,8 +18,7 @@ namespace XNCPLib.SWIF.Cast
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
 
             ID = reader.Read<int>();
             Flags = reader.Read<uint>();
@@ -31,20 +30,17 @@ namespace XNCPLib.SWIF.Cast
 
             if (CastOffset != 0)
             {
-                reader.PushOffsetOrigin();
-                reader.Seek(CastOffset, SeekOrigin.Begin);
-
-                switch (Flags & 0xF)
+                reader.ReadAtOffset(CastOffset, () =>
                 {
-                    case 1:
-                        ImageCast = reader.ReadObject<SWImageCast>();
-                        break;
-                    default:
-                        break;
-                }
-
-                reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-                reader.PopOffsetOrigin();
+                    switch (Flags & 0xF)
+                    {
+                        case 1:
+                            ImageCast = reader.ReadObject<SWImageCast>();
+                            break;
+                        default:
+                            break;
+                    }
+                }, true);
             }
         }
 

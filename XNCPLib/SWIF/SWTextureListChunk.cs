@@ -21,10 +21,11 @@ namespace XNCPLib.SWIF
 
             ListOffset = reader.Read<uint>();
             ListCount = reader.Read<uint>();
-
-            reader.Seek(reader.GetOffsetOrigin() - 8 + ListOffset, SeekOrigin.Begin);
-            for (int i = 0; i < ListCount; i++)
-                TextureLists.Add(reader.ReadObject<SWTextureList>());
+            reader.ReadAtOffset(ListOffset - 8, () =>
+            {
+                for (int i = 0; i < ListCount; i++)
+                    TextureLists.Add(reader.ReadObject<SWTextureList>());
+            });
 
             reader.Seek(reader.GetOffsetOrigin() + Header.Size, SeekOrigin.Begin);
             reader.PopOffsetOrigin();

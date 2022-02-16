@@ -1,9 +1,6 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
-using XNCPLib.Extensions;
 using XNCPLib.SWIF.Cast.ImageCast;
 
 namespace XNCPLib.SWIF.Cast
@@ -76,19 +73,14 @@ namespace XNCPLib.SWIF.Cast
             Field38 = reader.Read<uint>();
             Field3C = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(PatternInfoOffset, SeekOrigin.Begin);
-            for (int i = 0; i < PatternInfoCount; i++)
-                PatternInfoList.Add(reader.ReadObject<SWPatternInfo>());
+            reader.ReadAtOffset(PatternInfoOffset, () =>
+            {
+                for (int i = 0; i < PatternInfoCount; i++)
+                    PatternInfoList.Add(reader.ReadObject<SWPatternInfo>());
+            }, true);
 
             if ((Flags & (EFlags)0xFFF) == EFlags.eFlags_UseFont)
-            {
-                reader.Seek(FontInfoOffset, SeekOrigin.Begin);
-                FontInfo = reader.ReadObject<SWFontInfo>();
-            }
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+                reader.ReadAtOffset(FontInfoOffset, () => { FontInfo = reader.ReadObject<SWFontInfo>(); }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }

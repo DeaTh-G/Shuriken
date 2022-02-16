@@ -130,9 +130,9 @@ namespace Shuriken.ViewModels
             SWIFFile file = reader.ReadObject<SWIFFile>();
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
-            List<SWScene> swScenes = file.Project.Project.Scenes;
-            List<SWTextureList> swTextureLists = file.Project.Project.TextureLists;
-            List<SWFontList> swFontLists = file.Project.Project.FontLists;
+            List<SWScene> swScenes = file.Project.ProjectNode.Scenes;
+            List<SWTextureList> swTextureLists = file.Project.ProjectNode.TextureLists;
+            List<SWFontList> swFontLists = file.Project.ProjectNode.FontLists;
 
             Clear();
 
@@ -180,7 +180,7 @@ namespace Shuriken.ViewModels
 
             foreach (SWScene scene in swScenes)
             {
-                Project.Scenes.Add(new UIScene(file.Project.Project, scene, scene.Name, Project.TextureLists, Project.Fonts));
+                Project.Scenes.Add(new UIScene(file.Project.ProjectNode, scene, scene.Name, Project.TextureLists, Project.Fonts));
             }
 
             if (MissingTextures.Count > 0)

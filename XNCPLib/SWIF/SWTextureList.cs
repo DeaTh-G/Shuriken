@@ -16,20 +16,17 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
 
             TextureCount = reader.Read<uint>();
             TextureOffset = reader.Read<uint>();
+            reader.ReadAtOffset(TextureOffset, () =>
+            {
+                for (int i = 0; i < TextureCount; i++)
+                    Textures.Add(reader.ReadObject<SWTexture>());
+            }, true);
+
             Field0C = reader.Read<uint>();
-
-            reader.PushOffsetOrigin();
-            reader.Seek(TextureOffset, SeekOrigin.Begin);
-            for (int i = 0; i < TextureCount; i++)
-                Textures.Add(reader.ReadObject<SWTexture>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
         }
 
         public void Write(BinaryObjectWriter writer) { }

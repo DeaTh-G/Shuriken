@@ -62,7 +62,7 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        public UIScene(SWProject project, SWScene scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        public UIScene(SWProjectNode project, SWScene scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
             AspectRatio = scene.FrameSize.X / scene.FrameSize.Y;
@@ -220,21 +220,21 @@ namespace Shuriken.Models
             {
                 for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
                 {
-                    UICast cast = new UICast(scene.Layers[g].Casts[c], scene.Layers[g].Cells[c],
-                        scene.FrameSize, scene.Layers[g].Casts[c].Name, c);
+                    UICast cast = new UICast(scene.Layers[g].CastNodes[c], scene.Layers[g].Cells[c],
+                        scene.FrameSize, scene.Layers[g].CastNodes[c].Name, c);
                     
                     if (cast.Type == DrawType.Sprite)
                     {
-                        for (int index = 0; index < scene.Layers[g].Casts[c].ImageCast.PatternInfoCount; ++index)
+                        for (int index = 0; index < scene.Layers[g].CastNodes[c].ImageCast.PatternInfoCount; ++index)
                         {
-                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].TextureListIndex);
-                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].TextureMapIndex);
-                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].SpriteIndex);
+                            TextureList texList = texLists.ElementAt(scene.Layers[g].CastNodes[c].ImageCast.PatternInfoList[index].TextureListIndex);
+                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].CastNodes[c].ImageCast.PatternInfoList[index].TextureMapIndex);
+                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].CastNodes[c].ImageCast.PatternInfoList[index].SpriteIndex);
                         }
                     }
                     else if (cast.Type == DrawType.Font)
                     {
-                        UIFont font = fonts.ElementAt((int)scene.Layers[g].Casts[c].ImageCast.FontInfo.FontListIndex);
+                        UIFont font = fonts.ElementAt((int)scene.Layers[g].CastNodes[c].ImageCast.FontInfo.FontListIndex);
                         cast.Font = font;
                     }
 
@@ -242,7 +242,7 @@ namespace Shuriken.Models
                 }
 
                 // build hierarchy tree
-                CreateHierarchyTree(g, scene.Layers[g].Casts, tempCasts);
+                CreateHierarchyTree(g, scene.Layers[g].CastNodes, tempCasts);
 
                 tempCasts.Clear();
             }

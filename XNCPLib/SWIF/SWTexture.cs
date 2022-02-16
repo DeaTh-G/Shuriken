@@ -20,8 +20,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
 
             ID = reader.Read<uint>();
             Width = reader.Read<ushort>();
@@ -31,13 +30,11 @@ namespace XNCPLib.SWIF
             SubImageOffset = reader.Read<uint>();
             Field1C = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(SubImageOffset, SeekOrigin.Begin);
-            for (int i = 0; i < SubImageCount; i++)
-                SubImages.Add(reader.ReadObject<SWSubImage>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(SubImageOffset, () =>
+            {
+                for (int i = 0; i < SubImageCount; i++)
+                    SubImages.Add(reader.ReadObject<SWSubImage>());
+            }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }

@@ -18,8 +18,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
             ID = reader.Read<uint>();
 
             Position = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());

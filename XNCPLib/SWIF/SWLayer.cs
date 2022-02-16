@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 using XNCPLib.SWIF.Cast;
 using XNCPLib.SWIF.Animation;
@@ -20,14 +18,13 @@ namespace XNCPLib.SWIF
         public uint AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public List<SWCastNode> Casts { get; set; } = new();
+        public List<SWCastNode> CastNodes { get; set; } = new();
         public List<SWCell> Cells { get; set; } = new();
         public List<SWAnimation> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
             ID = reader.Read<uint>();
             Flags = reader.Read<uint>();
 
@@ -41,21 +38,23 @@ namespace XNCPLib.SWIF
             Field20 = reader.Read<uint>();
             Field24 = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(CastNodeOffset, SeekOrigin.Begin);
-            for (int i = 0; i < CastCellCount; i++)
-                Casts.Add(reader.ReadObject<SWCastNode>());
+            reader.ReadAtOffset(CastNodeOffset, () =>
+            {
+                for (int i = 0; i < CastCellCount; i++)
+                    CastNodes.Add(reader.ReadObject<SWCastNode>());
+            }, true);
 
-            reader.Seek(CellOffset, SeekOrigin.Begin);
-            for (int i = 0; i < CastCellCount; i++)
-                Cells.Add(reader.ReadObject<SWCell>());
+            reader.ReadAtOffset(CellOffset, () =>
+            {
+                for (int i = 0; i < CastCellCount; i++)
+                    Cells.Add(reader.ReadObject<SWCell>());
+            }, true);
 
-            reader.Seek(AnimationOffset, SeekOrigin.Begin);
-            for (int i = 0; i < AnimationCount; i++)
-                Animations.Add(reader.ReadObject<SWAnimation>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(AnimationOffset, () =>
+            {
+                for (int i = 0; i < AnimationCount; i++)
+                    Animations.Add(reader.ReadObject<SWAnimation>());
+            }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }

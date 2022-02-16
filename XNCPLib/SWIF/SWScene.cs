@@ -1,8 +1,6 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
@@ -25,8 +23,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
             ID = reader.Read<uint>();
             Flags = reader.Read<uint>();
 
@@ -42,17 +39,17 @@ namespace XNCPLib.SWIF
             FrameSize = new Vector2(reader.Read<float>(), reader.Read<float>());
             Field28 = reader.Read<uint>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(LayerOffset, SeekOrigin.Begin);
-            for (int i = 0; i < LayerCount; i++)
-                Layers.Add(reader.ReadObject<SWLayer>());
+            reader.ReadAtOffset(LayerOffset, () =>
+            {
+                for (int i = 0; i < LayerCount; i++)
+                    Layers.Add(reader.ReadObject<SWLayer>());
+            }, true);
 
-            reader.Seek(CameraOffset, SeekOrigin.Begin);
-            for (int i = 0; i < CameraCount; i++)
-                Cameras.Add(reader.ReadObject<SWCamera>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(CameraOffset, () =>
+            {
+                for (int i = 0; i < CameraCount; i++)
+                    Cameras.Add(reader.ReadObject<SWCamera>());
+            }, true);
         }
 
         public void Write(BinaryObjectWriter writer) { }
