@@ -17,7 +17,7 @@ namespace XNCPLib.SWIF
             TextureList = reader.ReadObject<SWTextureListChunk>();
             Project = reader.ReadObject<SWProjectChunk>();
             Offset = reader.ReadObject<OffsetChunk>();
-            End = reader.ReadObject<EndChunk>();
+            //End = reader.ReadObject<EndChunk>();
         }
 
         public void Write(BinaryObjectWriter writer) { }

@@ -156,6 +156,7 @@ namespace Shuriken.Models
             Translation = new Vector2();
             if (index == 0)
                 Translation = new Vector2(0.5f, 0.5f);
+            ZTranslation = cell.CellInfo.Position.Z;
 
             Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;
             Scale = new Vector3(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y, cell.CellInfo.Scale.Z);

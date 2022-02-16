@@ -30,7 +30,9 @@ namespace XNCPLib.SWIF.Cast
             Rotation = reader.Read<ushort>();
             Field16 = reader.Read<ushort>();
 
-            if (Field16 == 0)
+            if (Field16 == 1)
+                Scale = new Vector3(1.0f, 1.0f, 1.0f);
+            else
                 Scale = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
         }
 
