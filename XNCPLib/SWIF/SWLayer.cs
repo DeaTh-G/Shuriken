@@ -1,91 +1,63 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
+using XNCPLib.SWIF.Cast;
 using XNCPLib.SWIF.Animation;
 
 namespace XNCPLib.SWIF
 {
-    public class SWLayer
+    public class SWLayer : IBinarySerializable
     {
-        public enum EFlags
-        {
-            eFlags_Enabled = 1
-        }
-
         public string Name { get; set; }
         public uint ID { get; set; }
-        public EFlags Flags { get; set; }
+        public uint Flags { get; set; }
         public uint CastCellCount { get; set; }
-        public uint CastOffset { get; set; }
+        public uint CastNodeOffset { get; set; }
         public uint CellOffset { get; set; }
         public uint AnimationCount { get; set; }
         public uint AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public List<SWCastNode> Casts { get; set; }
-        public List<SWCell> Cells { get; set; }
-        public List<SWAnimation> Animations { get; set; }
-
-        public SWLayer()
-        {
-            Casts = new List<SWCastNode>();
-            Cells = new List<SWCell>();
-            Animations = new List<SWAnimation>();
-        }
+        public List<SWCastNode> Casts { get; set; } = new();
+        public List<SWCell> Cells { get; set; } = new();
+        public List<SWAnimation> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
-            ID = reader.ReadUInt32();
-            Flags = (EFlags)reader.ReadUInt32();
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
+            ID = reader.Read<uint>();
+            Flags = reader.Read<uint>();
 
-            CastCellCount = reader.ReadUInt32();
-            CastOffset = reader.ReadUInt32();
-            CellOffset = reader.ReadUInt32();
+            CastCellCount = reader.Read<uint>();
+            CastNodeOffset = reader.Read<uint>();
+            CellOffset = reader.Read<uint>();
 
-            AnimationCount = reader.ReadUInt32();
-            AnimationOffset = reader.ReadUInt32();
+            AnimationCount = reader.Read<uint>();
+            AnimationOffset = reader.Read<uint>();
 
-            Field20 = reader.ReadUInt32();
-            Field24 = reader.ReadUInt32();
+            Field20 = reader.Read<uint>();
+            Field24 = reader.Read<uint>();
+
             reader.PushOffsetOrigin();
-
-            reader.Seek(CastOffset, SeekOrigin.Begin);
+            reader.Seek(CastNodeOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCellCount; i++)
-            {
-                SWCastNode cast = new SWCastNode();
-                cast.Read(reader);
-
-                Casts.Add(cast);
-            }
+                Casts.Add(reader.ReadObject<SWCastNode>());
 
             reader.Seek(CellOffset, SeekOrigin.Begin);
             for (int i = 0; i < CastCellCount; i++)
-            {
-                SWCell cell = new SWCell();
-                cell.Read(reader);
-
-                Cells.Add(cell);
-            }
+                Cells.Add(reader.ReadObject<SWCell>());
 
             reader.Seek(AnimationOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationCount; i++)
-            {
-                SWAnimation animation = new SWAnimation();
-                animation.Read(reader);
-
-                Animations.Add(animation);
-            }
+                Animations.Add(reader.ReadObject<SWAnimation>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

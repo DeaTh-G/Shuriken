@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Collections.Generic;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
@@ -7,24 +6,23 @@ using XNCPLib.Common;
 
 namespace XNCPLib.SWIF
 {
-    public class SWTextureListChunk : IBinarySerializable
+    public class SWProjectChunk : IBinarySerializable
     {
         public ChunkHeader Header { get; set; } = new();
-        public uint ListOffset { get; set; }
-        public uint ListCount { get; set; }
-        public List<SWTextureList> TextureLists { get; set; } = new();
+        public uint ProjectNodeOffset { get; set; }
+        public uint Field0C { get; set; }
+        public SWProject Project { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
             Header = reader.ReadObject<ChunkHeader>();
             reader.PushOffsetOrigin();
 
-            ListOffset = reader.Read<uint>();
-            ListCount = reader.Read<uint>();
+            ProjectNodeOffset = reader.Read<uint>();
+            Field0C = reader.Read<uint>();
 
-            reader.Seek(reader.GetOffsetOrigin() - 8 + ListOffset, SeekOrigin.Begin);
-            for (int i = 0; i < ListCount; i++)
-                TextureLists.Add(reader.ReadObject<SWTextureList>());
+            reader.Seek(reader.GetOffsetOrigin() - 8 + ProjectNodeOffset, SeekOrigin.Begin);
+            Project = reader.ReadObject<SWProject>();
 
             reader.Seek(reader.GetOffsetOrigin() + Header.Size, SeekOrigin.Begin);
             reader.PopOffsetOrigin();

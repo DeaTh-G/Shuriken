@@ -1,49 +1,37 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWTextureList
+    public class SWTextureList : IBinarySerializable
     {
         public string Name { get; set; }
         public uint TextureCount { get; set; }
         public uint TextureOffset { get; set; }
-        public uint UserDataOffset { get; set; }
-        public List<SWTexture> Textures { get; set; }
-
-        public SWTextureList()
-        {
-            Textures = new List<SWTexture>();
-        }
+        public uint Field0C { get; set; }
+        public List<SWTexture> Textures { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
 
-            TextureCount = reader.ReadUInt32();
-            TextureOffset = reader.ReadUInt32();
-            UserDataOffset = reader.ReadUInt32();
+            TextureCount = reader.Read<uint>();
+            TextureOffset = reader.Read<uint>();
+            Field0C = reader.Read<uint>();
 
             reader.PushOffsetOrigin();
             reader.Seek(TextureOffset, SeekOrigin.Begin);
             for (int i = 0; i < TextureCount; i++)
-            {
-                SWTexture texture = new SWTexture();
-                texture.Read(reader);
-
-                Textures.Add(texture);
-            }
+                Textures.Add(reader.ReadObject<SWTexture>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

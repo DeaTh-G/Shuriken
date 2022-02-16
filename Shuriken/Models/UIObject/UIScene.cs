@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XNCPLib.XNCP;
 using XNCPLib.SWIF;
+using XNCPLib.SWIF.Cast;
 using System.ComponentModel;
 using Shuriken.Models.Animation;
 using Shuriken.Misc;
@@ -224,16 +225,16 @@ namespace Shuriken.Models
                     
                     if (cast.Type == DrawType.Sprite)
                     {
-                        for (int index = 0; index < scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoCount; ++index)
+                        for (int index = 0; index < scene.Layers[g].Casts[c].ImageCast.PatternInfoCount; ++index)
                         {
-                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].TextureListIndex);
-                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].TextureMapIndex);
-                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].Cast.ImageCast.PatternInfoList[index].SpriteIndex);
+                            TextureList texList = texLists.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].TextureListIndex);
+                            Texture texture = texList.Textures.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].TextureMapIndex);
+                            cast.Sprites[index] = texture.Sprites.ElementAt(scene.Layers[g].Casts[c].ImageCast.PatternInfoList[index].SpriteIndex);
                         }
                     }
                     else if (cast.Type == DrawType.Font)
                     {
-                        UIFont font = fonts.ElementAt((int)scene.Layers[g].Casts[c].Cast.ImageCast.FontInfo.FontListIndex);
+                        UIFont font = fonts.ElementAt((int)scene.Layers[g].Casts[c].ImageCast.FontInfo.FontListIndex);
                         cast.Font = font;
                     }
 

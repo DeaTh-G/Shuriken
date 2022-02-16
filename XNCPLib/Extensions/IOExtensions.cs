@@ -15,30 +15,20 @@ namespace XNCPLib.Extensions
         {
             return reader.OffsetHandler.OffsetOrigin;
         }
-        public static string ReadStringOffset(this BinaryObjectReader reader, long offset)
+        public static string ReadStringOffset(this BinaryObjectReader reader, long offset, bool absolute = false)
         {
             if (offset == 0)
                 return "";
 
             long savedPosition = reader.Position;
-            reader.Seek(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
+            if (absolute)
+                reader.Seek(offset, SeekOrigin.Begin);
+            else
+                reader.Seek(reader.GetOffsetOrigin() + offset, SeekOrigin.Begin);
 
             string result = reader.ReadString(StringBinaryFormat.NullTerminated);
             reader.Seek(savedPosition, SeekOrigin.Begin);
             
-            return result;
-        }
-        public static string ReadAbsoluteStringOffset(this BinaryObjectReader reader, long offset)
-        {
-            if (offset == 0)
-                return "";
-
-            long savedPosition = reader.Position;
-            reader.Seek(offset, SeekOrigin.Begin);
-
-            string result = reader.ReadString(StringBinaryFormat.NullTerminated);
-            reader.Seek(savedPosition, SeekOrigin.Begin);
-
             return result;
         }
     }

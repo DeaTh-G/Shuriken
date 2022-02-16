@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using XNCPLib.XNCP;
 using XNCPLib.Misc;
-using XNCPLib.SWIF;
+using XNCPLib.SWIF.Cast;
 using Shuriken.ViewModels;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -170,28 +170,28 @@ namespace Shuriken.Models
             GradientTopRight = new Color(255, 255, 255, 255);
             GradientBottomRight = new Color(255, 255, 255, 255);
 
-            if ((castnode.Flags & 0xF) == (int)SWCastNode.EFlags.eFlags_ImageCast)
+            if ((castnode.Flags & 0xF) == 1)
             {
-                Type = (castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
+                Type = (castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
                 
                 Vector2 anchorPoint = new Vector2();
-                anchorPoint.X = (castnode.Cast.ImageCast.AnchorPoint.X != 0 ? castnode.Cast.ImageCast.AnchorPoint.X : castnode.Cast.ImageCast.Width) / framesize.X;
-                anchorPoint.Y = (castnode.Cast.ImageCast.AnchorPoint.Y != 0 ? castnode.Cast.ImageCast.AnchorPoint.Y : castnode.Cast.ImageCast.Height) / framesize.Y;
-                if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorRight) == SWImageCast.EFlags.eFlags_AnchorRight)
+                anchorPoint.X = (castnode.ImageCast.AnchorPoint.X != 0 ? castnode.ImageCast.AnchorPoint.X : castnode.ImageCast.Width) / framesize.X;
+                anchorPoint.Y = (castnode.ImageCast.AnchorPoint.Y != 0 ? castnode.ImageCast.AnchorPoint.Y : castnode.ImageCast.Height) / framesize.Y;
+                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorRight) == SWImageCast.EFlags.eFlags_AnchorRight)
                 {
                     TopRight = new Vector2(anchorPoint.X, 0);
                     BottomRight = new Vector2(anchorPoint.X, 0);
                 }
-                else if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorLeft) == SWImageCast.EFlags.eFlags_AnchorLeft)
+                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorLeft) == SWImageCast.EFlags.eFlags_AnchorLeft)
                 {
                     TopLeft = new Vector2(anchorPoint.X, 0);
                     BottomLeft = new Vector2(anchorPoint.X, 0);
                 }
-                else if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopRight) == SWImageCast.EFlags.eFlags_AnchorTopRight)
+                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopRight) == SWImageCast.EFlags.eFlags_AnchorTopRight)
                 {
                     TopRight = new Vector2(anchorPoint.X, anchorPoint.Y);
                 }
-                else if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopLeft) == SWImageCast.EFlags.eFlags_AnchorTopLeft)
+                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopLeft) == SWImageCast.EFlags.eFlags_AnchorTopLeft)
                 {
                     TopLeft = new Vector2(anchorPoint.X, 0);
                     TopRight = new Vector2(0, anchorPoint.Y);
@@ -200,36 +200,36 @@ namespace Shuriken.Models
                 //Flags = (uint)cast.Flags;
 
                 Font = null;
-                FontCharacters = castnode.Cast.ImageCast.FontInfo.Characters;
+                FontCharacters = castnode.ImageCast.FontInfo.Characters;
 
-                Width = (uint)castnode.Cast.ImageCast.Width;
-                Height = (uint)castnode.Cast.ImageCast.Height;
+                Width = (uint)castnode.ImageCast.Width;
+                Height = (uint)castnode.ImageCast.Height;
 
-                if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_RotateLeft) == SWImageCast.EFlags.eFlags_RotateLeft)
+                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_RotateLeft) == SWImageCast.EFlags.eFlags_RotateLeft)
                 {
-                    Width = (uint)castnode.Cast.ImageCast.Height;
-                    Height = (uint)castnode.Cast.ImageCast.Width;
+                    Width = (uint)castnode.ImageCast.Height;
+                    Height = (uint)castnode.ImageCast.Width;
                     Rotation += 90;
                 }
 
-                if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontally) == SWImageCast.EFlags.eFlags_FlipHorizontally)
+                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontally) == SWImageCast.EFlags.eFlags_FlipHorizontally)
                 {
                     Scale.X = -Scale.X;
                 }
-                else if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipVertically) == SWImageCast.EFlags.eFlags_FlipVertically)
+                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipVertically) == SWImageCast.EFlags.eFlags_FlipVertically)
                 {
                     Scale.Y = -Scale.Y;
                 }
-                else if ((castnode.Cast.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically) == SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically)
+                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically) == SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically)
                 {
                     Scale.X = -Scale.X;
                     Scale.Y = -Scale.Y;
                 }
 
-                GradientTopLeft = new Color(Utilities.ReverseColor(castnode.Cast.ImageCast.GradientTopLeft));
-                GradientBottomLeft = new Color(Utilities.ReverseColor(castnode.Cast.ImageCast.GradientBottomLeft));
-                GradientTopRight = new Color(Utilities.ReverseColor(castnode.Cast.ImageCast.GradientTopRight));
-                GradientBottomRight = new Color(Utilities.ReverseColor(castnode.Cast.ImageCast.GradientBottomRight));
+                GradientTopLeft = new Color(Utilities.ReverseColor(castnode.ImageCast.GradientTopLeft));
+                GradientBottomLeft = new Color(Utilities.ReverseColor(castnode.ImageCast.GradientBottomLeft));
+                GradientTopRight = new Color(Utilities.ReverseColor(castnode.ImageCast.GradientTopRight));
+                GradientBottomRight = new Color(Utilities.ReverseColor(castnode.ImageCast.GradientBottomRight));
             }
 
             Sprites = new ObservableCollection<int>();

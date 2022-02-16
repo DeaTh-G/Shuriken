@@ -1,16 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimation
+    public class SWAnimation : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID { get; set; }
@@ -22,43 +18,35 @@ namespace XNCPLib.SWIF.Animation
         public byte Field19 { get; set; }
         public byte Field1A { get; set; }
         public byte Field1B { get; set; }
-        public List<SWAnimationLink> AnimationLinks { get; set; }
+        public List<SWAnimationLink> AnimationLinks { get; set; } = new();
 
-        public SWAnimation()
-        {
-            AnimationLinks = new List<SWAnimationLink>();
-        }
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
 
-            ID = reader.ReadUInt32();
+            ID = reader.Read<uint>();
 
-            AnimationLinkCount = reader.ReadUInt32();
-            Field0C = reader.ReadUInt32();
-            AnimationLinkOffset = reader.ReadUInt32();
+            AnimationLinkCount = reader.Read<uint>();
+            Field0C = reader.Read<uint>();
+            AnimationLinkOffset = reader.Read<uint>();
 
-            Field14 = reader.ReadUInt32();
+            Field14 = reader.Read<uint>();
 
-            Field18 = reader.ReadByte();
-            Field19 = reader.ReadByte();
-            Field1A = reader.ReadByte();
-            Field1B = reader.ReadByte();
+            Field18 = reader.Read<byte>();
+            Field19 = reader.Read<byte>();
+            Field1A = reader.Read<byte>();
+            Field1B = reader.Read<byte>();
 
             reader.PushOffsetOrigin();
-
             reader.Seek(AnimationLinkOffset, SeekOrigin.Begin);
             for (int i = 0; i < AnimationLinkCount; i++)
-            {
-                SWAnimationLink animationLink = new SWAnimationLink();
-                animationLink.Read(reader);
-
-                AnimationLinks.Add(animationLink);
-            }
+                AnimationLinks.Add(reader.ReadObject<SWAnimationLink>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

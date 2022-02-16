@@ -12,6 +12,7 @@ using Shuriken.Commands;
 using System.Windows;
 using Shuriken.Misc;
 using System.Reflection;
+using Amicitia.IO.Binary;
 
 namespace Shuriken.ViewModels
 {
@@ -125,13 +126,13 @@ namespace Shuriken.ViewModels
 
         public void LoadSWIF(string filename)
         {
-            SWIFFile file = new SWIFFile();
-            file.Load(filename);
+            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
+            SWIFFile file = reader.ReadObject<SWIFFile>();
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
-            List<SWScene> swScenes = file.Content.SurfWaveProject.Project.Scenes;
-            List<SWTextureList> swTextureLists = file.Content.SurfWaveProject.Project.TextureLists;
-            List<SWFontList> swFontLists = file.Content.SurfWaveProject.Project.FontLists;
+            List<SWScene> swScenes = file.Project.Project.Scenes;
+            List<SWTextureList> swTextureLists = file.Project.Project.TextureLists;
+            List<SWFontList> swFontLists = file.Project.Project.FontLists;
 
             Clear();
 
@@ -179,7 +180,7 @@ namespace Shuriken.ViewModels
 
             foreach (SWScene scene in swScenes)
             {
-                Project.Scenes.Add(new UIScene(file.Content.SurfWaveProject.Project, scene, scene.Name, Project.TextureLists, Project.Fonts));
+                Project.Scenes.Add(new UIScene(file.Project.Project, scene, scene.Name, Project.TextureLists, Project.Fonts));
             }
 
             if (MissingTextures.Count > 0)

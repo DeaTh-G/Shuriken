@@ -1,41 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
-using XNCPLib.Extensions;
+﻿using Amicitia.IO.Binary;
+using XNCPLib.Common;
 
 namespace XNCPLib.SWIF
 {
-    public class SWIFFile
+    public class SWIFFile : IBinarySerializable
     {
-        public ChunkFile Content { get; set; }
+        public SWInfoChunk Info { get; set; } = new();
+        public SWTextureListChunk TextureList { get; set; } = new();
+        public SWProjectChunk Project { get; set; } = new();
+        public OffsetChunk Offset { get; set; } = new();
+        public EndChunk End { get; set; } = new();
 
-        public SWIFFile()
+        public void Read(BinaryObjectReader reader)
         {
-            Content = new ChunkFile();
+            Info = reader.ReadObject<SWInfoChunk>();
+            TextureList = reader.ReadObject<SWTextureListChunk>();
+            Project = reader.ReadObject<SWProjectChunk>();
+            Offset = reader.ReadObject<OffsetChunk>();
+            End = reader.ReadObject<EndChunk>();
         }
 
-        public void Load(string filename)
-        {
-            BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
-            reader.PushOffsetOrigin();
-
-            // Signature
-            reader.ReadUInt32();
-            uint infoSize = reader.ReadUInt32();
-            if (infoSize == 402653184)
-                reader.Endianness = Endianness.Big;
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            Content.Read(reader);
-
-            reader.PopOffsetOrigin();
-
-            reader.Dispose();
-        }
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

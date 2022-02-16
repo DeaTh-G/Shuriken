@@ -1,17 +1,15 @@
 ﻿using Amicitia.IO.Binary;
 
-namespace XNCPLib.SWIF
+namespace XNCPLib.SWIF.Cast.ImageCast
 {
-    public struct SWFontMapping : IBinarySerializable
+    public struct SWPatternInfo : IBinarySerializable
     {
-        public ushort Character;
-        public short TextureListIndex;
-        public short TextureMapIndex;
-        public short SpriteIndex;
+        public ushort TextureListIndex;
+        public ushort TextureMapIndex;
+        public ushort SpriteIndex;
 
         public void Read(BinaryObjectReader reader)
         {
-            reader.Read(out Character);
             reader.Read(out TextureListIndex);
             reader.Read(out TextureMapIndex);
             reader.Read(out SpriteIndex);

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Numerics;
+﻿using System.Numerics;
 using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWCamera
+    public class SWCamera : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID;
@@ -21,27 +16,23 @@ namespace XNCPLib.SWIF
         public uint Field2C { get; set; }
         public uint Field30 { get; set; }
 
-        public SWCamera()
-        {
-            Position = new Vector3(0.0f, 1.0f, 0.0f);
-            LookAt = new Vector3(0.0f, 1.0f, 0.0f);
-        }
-
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
-            ID = reader.ReadUInt32();
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
+            ID = reader.Read<uint>();
 
-            Position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            LookAt = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            Position = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
+            LookAt = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
 
-            Flags = reader.ReadUInt32();
-            RangeIn = reader.ReadSingle();
-            RangeOut = reader.ReadSingle();
+            Flags = reader.Read<uint>();
+            RangeIn = reader.Read<float>();
+            RangeOut = reader.Read<float>();
 
-            Field2C = reader.ReadUInt32();
-            Field30 = reader.ReadUInt32();
+            Field2C = reader.Read<uint>();
+            Field30 = reader.Read<uint>();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

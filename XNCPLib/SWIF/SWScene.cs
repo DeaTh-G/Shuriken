@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
@@ -11,16 +7,11 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWScene
+    public class SWScene : IBinarySerializable
     {
-        public enum EFlags
-        {
-            eFlags_Hidden = 1
-        }
-
         public string Name { get; set; }
         public uint ID { get; set; }
-        public EFlags Flags { get; set; }
+        public uint Flags { get; set; }
         public uint LayerCount { get; set; }
         public uint LayerOffset { get; set; }
         public ushort CameraCount { get; set; }
@@ -29,56 +20,41 @@ namespace XNCPLib.SWIF
         public uint BackgroundColor { get; set; }
         public Vector2 FrameSize { get; set; }
         public uint Field28 { get; set; }
-        public List<SWLayer> Layers { get; set; }
-        public List<SWCamera> Cameras { get; set; }
-
-        public SWScene()
-        {
-            FrameSize = new Vector2(1280, 720);
-            Layers = new List<SWLayer>();
-            Cameras = new List<SWCamera>();
-        }
+        public List<SWLayer> Layers { get; set; } = new();
+        public List<SWCamera> Cameras { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
-            ID = reader.ReadUInt32();
-            Flags = (EFlags)reader.ReadUInt32();
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
+            ID = reader.Read<uint>();
+            Flags = reader.Read<uint>();
 
-            LayerCount = reader.ReadUInt32();
-            LayerOffset = reader.ReadUInt32();
+            LayerCount = reader.Read<uint>();
+            LayerOffset = reader.Read<uint>();
 
-            CameraCount = reader.ReadUInt16();
-            Field16 = reader.ReadUInt16();
-            CameraOffset = reader.ReadUInt32();
+            CameraCount = reader.Read<ushort>();
+            Field16 = reader.Read<ushort>();
+            CameraOffset = reader.Read<uint>();
 
-            BackgroundColor = reader.ReadUInt32();
+            BackgroundColor = reader.Read<uint>();
 
-            FrameSize = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-            Field28 = reader.ReadUInt32();
+            FrameSize = new Vector2(reader.Read<float>(), reader.Read<float>());
+            Field28 = reader.Read<uint>();
 
             reader.PushOffsetOrigin();
             reader.Seek(LayerOffset, SeekOrigin.Begin);
             for (int i = 0; i < LayerCount; i++)
-            {
-                SWLayer layer = new SWLayer();
-                layer.Read(reader);
-
-                Layers.Add(layer);
-            }
+                Layers.Add(reader.ReadObject<SWLayer>());
 
             reader.Seek(CameraOffset, SeekOrigin.Begin);
             for (int i = 0; i < CameraCount; i++)
-            {
-                SWCamera camera = new SWCamera();
-                camera.Read(reader);
-
-                Cameras.Add(camera);
-            }
+                Cameras.Add(reader.ReadObject<SWCamera>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

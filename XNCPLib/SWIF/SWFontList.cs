@@ -1,16 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWFontList
+    public class SWFontList : IBinarySerializable
     {
         public string Name { get; set; }
         public uint Field04 { get; set; }
@@ -20,39 +16,31 @@ namespace XNCPLib.SWIF
         public uint FontMappingOffset { get; set; }
         public uint Field14 { get; set; }
         public uint Field18 { get; set; }
-        public List<SWFontMapping> FontMappings { get; set; }
-
-        public SWFontList()
-        {
-            FontMappings = new List<SWFontMapping>();
-        }
+        public List<SWFontMapping> FontMappings { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
-            Field04 = reader.ReadUInt32();
-            Field08 = reader.ReadUInt32();
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
+            Field04 = reader.Read<uint>();
+            Field08 = reader.Read<uint>();
 
-            FontMappingCount = reader.ReadUInt16();
-            Field0E = reader.ReadUInt16();
-            FontMappingOffset = reader.ReadUInt32();
+            FontMappingCount = reader.Read<ushort>();
+            Field0E = reader.Read<ushort>();
+            FontMappingOffset = reader.Read<uint>();
 
-            Field14 = reader.ReadUInt32();
-            Field18 = reader.ReadUInt32();
+            Field14 = reader.Read<uint>();
+            Field18 = reader.Read<uint>();
 
             reader.PushOffsetOrigin();
             reader.Seek(FontMappingOffset, SeekOrigin.Begin);
             for (int i = 0; i < FontMappingCount; i++)
-            {
-                SWFontMapping fontMap = new SWFontMapping();
-                fontMap.Read(reader);
-
-                FontMappings.Add(fontMap);
-            }
+                FontMappings.Add(reader.ReadObject<SWFontMapping>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

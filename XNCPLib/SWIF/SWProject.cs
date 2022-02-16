@@ -9,7 +9,7 @@ using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWProject
+    public class SWProject : IBinarySerializable
     {
         public string Name { get; set; }
         public ushort SceneCount { get; set; }
@@ -19,52 +19,39 @@ namespace XNCPLib.SWIF
         public uint SceneOffset { get; set; }
         public uint TextureListOffset { get; set; }
         public uint FontListOffset { get; set; }
-        public SWCamera Camera { get; set; }
+        public SWCamera Camera { get; set; } = new();
         public uint StartFrame { get; set; }
         public uint EndFrame { get; set; }
         public float FrameRate { get; set; }
         public uint Field5C { get; set; }
-        public List<SWScene> Scenes { get; set; }
-        public List<SWTextureList> TextureLists { get; set; }
-        public List<SWFontList> FontLists { get; set; }
-
-        public SWProject()
-        {
-            Camera = new SWCamera();
-            Scenes = new List<SWScene>();
-            TextureLists = new List<SWTextureList>();
-            FontLists = new List<SWFontList>();
-        }
+        public List<SWScene> Scenes { get; set; } = new();
+        public List<SWTextureList> TextureLists { get; set; } = new();
+        public List<SWFontList> FontLists { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
 
-            SceneCount = reader.ReadUInt16();
-            Field06 = reader.ReadUInt16();
-            TextureListCount = reader.ReadUInt16();
-            FontListCount = reader.ReadUInt16();
+            SceneCount = reader.Read<ushort>();
+            Field06 = reader.Read<ushort>();
+            TextureListCount = reader.Read<ushort>();
+            FontListCount = reader.Read<ushort>();
 
-            SceneOffset = reader.ReadUInt32();
-            TextureListOffset = reader.ReadUInt32();
-            FontListOffset = reader.ReadUInt32();
+            SceneOffset = reader.Read<uint>();
+            TextureListOffset = reader.Read<uint>();
+            FontListOffset = reader.Read<uint>();
 
-            Camera.Read(reader);
+            Camera = reader.ReadObject<SWCamera>();
 
-            StartFrame = reader.ReadUInt32();
-            EndFrame = reader.ReadUInt32();
-            FrameRate = reader.ReadSingle();
-            Field5C = reader.ReadUInt32();
+            StartFrame = reader.Read<uint>();
+            EndFrame = reader.Read<uint>();
+            FrameRate = reader.Read<float>();
+            Field5C = reader.Read<uint>();
 
             reader.Seek(SceneOffset, SeekOrigin.Begin);
             for (int i = 0; i < SceneCount; i++)
-            {
-                SWScene scene = new SWScene();
-                scene.Read(reader);
-
-                Scenes.Add(scene);
-            }
+                Scenes.Add(reader.ReadObject<SWScene>());
 
             reader.Seek(TextureListOffset, SeekOrigin.Begin);
             for (int i = 0; i < TextureListCount; i++)
@@ -84,5 +71,7 @@ namespace XNCPLib.SWIF
                 FontLists.Add(fontList);
             }
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }

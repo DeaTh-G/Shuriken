@@ -1,16 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amicitia.IO.Binary;
 using Amicitia.IO.Binary.Extensions;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
-    public class SWTexture
+    public class SWTexture : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID { get; set; }
@@ -20,38 +16,30 @@ namespace XNCPLib.SWIF
         public uint SubImageCount { get; set; }
         public uint SubImageOffset { get; set; }
         public uint Field1C { get; set; }
-        public List<SWSubImage> SubImages { get; set; }
-
-        public SWTexture()
-        {
-            SubImages = new List<SWSubImage>();
-        }
+        public List<SWSubImage> SubImages { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.ReadUInt32();
-            Name = reader.ReadAbsoluteStringOffset(nameOffset);
+            uint nameOffset = reader.Read<uint>();
+            Name = reader.ReadStringOffset(nameOffset, true);
 
-            ID = reader.ReadUInt32();
-            Width = reader.ReadUInt16();
-            Height = reader.ReadUInt16();
-            Flags = reader.ReadUInt32();
-            SubImageCount = reader.ReadUInt32();
-            SubImageOffset = reader.ReadUInt32();
-            Field1C = reader.ReadUInt32();
+            ID = reader.Read<uint>();
+            Width = reader.Read<ushort>();
+            Height = reader.Read<ushort>();
+            Flags = reader.Read<uint>();
+            SubImageCount = reader.Read<uint>();
+            SubImageOffset = reader.Read<uint>();
+            Field1C = reader.Read<uint>();
+
             reader.PushOffsetOrigin();
-
             reader.Seek(SubImageOffset, SeekOrigin.Begin);
             for (int i = 0; i < SubImageCount; i++)
-            {
-                SWSubImage subImage = new SWSubImage();
-                subImage.Read(reader);
-
-                SubImages.Add(subImage);
-            }
+                SubImages.Add(reader.ReadObject<SWSubImage>());
 
             reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
             reader.PopOffsetOrigin();
         }
+
+        public void Write(BinaryObjectWriter writer) { }
     }
 }
