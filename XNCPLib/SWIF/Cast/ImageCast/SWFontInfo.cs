@@ -1,8 +1,5 @@
-﻿using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
-using System.IO;
-using System.Numerics;
-using XNCPLib.Extensions;
+﻿using System.Numerics;
+using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Cast.ImageCast
 {

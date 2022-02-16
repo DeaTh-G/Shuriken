@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
+﻿using Amicitia.IO.Binary;
 using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF.Cast
