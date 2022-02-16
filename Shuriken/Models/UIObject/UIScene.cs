@@ -250,8 +250,14 @@ namespace Shuriken.Models
 
         private void CreateHierarchyTree(int group, List<CastHierarchyTreeNode> tree, List<UICast> lyrs)
         {
-            Groups[group].Casts.Add(lyrs[0]);
-            BuildTree(0, tree, lyrs, null);
+            int next = 0;
+            while (next != -1)
+            {
+                Groups[group].Casts.Add(lyrs[next]);
+                BuildTree(next, tree, lyrs, null);
+
+                next = tree[next].NextIndex;
+            }
         }
 
         private void CreateHierarchyTree(int group, List<SWCastNode> casts, List<UICast> lyrs)
@@ -277,14 +283,16 @@ namespace Shuriken.Models
                 BuildTree(childIndex, tree, lyrs, lyrs[c]);
             }
 
-            int siblingIndex = tree[c].NextIndex;
-            if (siblingIndex != -1)
+            if (parent != null)
             {
-                UICast sibling = lyrs[siblingIndex];
-                if (parent != null)
+                int siblingIndex = tree[c].NextIndex;
+                if (siblingIndex != -1)
+                {
+                    UICast sibling = lyrs[siblingIndex];
                     parent.Children.Add(sibling);
 
-                BuildTree(siblingIndex, tree, lyrs, parent);
+                    BuildTree(siblingIndex, tree, lyrs, parent);
+                }
             }
         }
 

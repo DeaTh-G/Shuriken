@@ -32,10 +32,7 @@ namespace Shuriken.Models
 
         public bool IsEnabled { get; set; }
 
-        public Vector2 TopLeft { get; set; }
-        public Vector2 BottomLeft { get; set; }
-        public Vector2 TopRight { get; set; }
-        public Vector2 BottomRight { get; set; }
+        public Vector2 Anchor { get; set; }
 
         public uint Field2C { get; set; }
         public uint Field34 { get; set; }
@@ -54,13 +51,14 @@ namespace Shuriken.Models
         public Vector2 Offset { get; set; }
         public float Field68 { get; set; }
         public float Field6C { get; set; }
-        public uint Field70 { get; set; }
+        public uint FontSpacingCorrection { get; set; }
         public int InfoField00 { get; set; }
 
 
         public Vector2 Translation { get; set; }
+        public float ZTranslation { get; set; }
         public float Rotation { get; set; }
-        public Vector2 Scale { get; set; }
+        public Vector3 Scale { get; set; }
 
         public float InfoField18 { get; set; }
         public Color Color { get ; set; }
@@ -75,6 +73,7 @@ namespace Shuriken.Models
 
         public bool Visible { get; set; }
         public int ZIndex { get; set; }
+        public int DefaultSprite { get; set; }
 
         public ObservableCollection<int> Sprites { get; set; }
         public ObservableCollection<UICast> Children { get; set; }
@@ -99,10 +98,9 @@ namespace Shuriken.Models
             ZIndex = index;
             Children = new ObservableCollection<UICast>();
 
-            TopLeft = new Vector2(cast.TopLeft);
-            BottomLeft = new Vector2(cast.BottomLeft);
-            TopRight = new Vector2(cast.TopRight);
-            BottomRight = new Vector2(cast.BottomRight);
+            float right = Math.Abs(cast.TopRight.X) - Math.Abs(cast.TopLeft.X);
+            float top = Math.Abs(cast.TopRight.Y) - Math.Abs(cast.BottomRight.Y);
+            Anchor = new Vector2(right, top);
 
             Field2C = cast.Field2C;
             Field34 = cast.Field34;
@@ -122,12 +120,12 @@ namespace Shuriken.Models
 
             Field68 = cast.Field68;
             Field6C = cast.Field6C;
-            Field70 = cast.Field70;
+            FontSpacingCorrection = cast.FontSpacingCorrection;
 
             InfoField00 = cast.CastInfoData.Field00;
             Translation = new Vector2(cast.CastInfoData.Translation);
             Rotation = cast.CastInfoData.Rotation;
-            Scale = new Vector2(cast.CastInfoData.Scale);
+            Scale = new Vector3(cast.CastInfoData.Scale.X, cast.CastInfoData.Scale.Y, 1.0f);
             InfoField18 = cast.CastInfoData.Field18;
             Color = new Color(cast.CastInfoData.Color);
             GradientTopLeft = new Color(cast.CastInfoData.GradientTopLeft);
@@ -138,9 +136,9 @@ namespace Shuriken.Models
             InfoField34 = cast.CastInfoData.Field34;
             InfoField38 = cast.CastInfoData.Field38;
 
-            Sprites = new ObservableCollection<int>();
-            for (int i = 0; i < 32; ++i)
-                Sprites.Add(-1);
+            Sprites = new ObservableCollection<int>(Enumerable.Repeat(-1, 32).ToList());
+
+            DefaultSprite = 0;
         }
 
         public UICast(SWCastNode castnode, SWCell cell, System.Numerics.Vector2 framesize, string name, int index)
@@ -151,10 +149,7 @@ namespace Shuriken.Models
             ZIndex = index;
             Children = new ObservableCollection<UICast>();
 
-            TopLeft = new Vector2();
-            BottomLeft = new Vector2();
-            TopRight = new Vector2();
-            BottomRight = new Vector2();
+            Anchor = new Vector2(0, 0);
 
             Offset = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
 
@@ -163,7 +158,7 @@ namespace Shuriken.Models
                 Translation = new Vector2(0.5f, 0.5f);
 
             Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;
-            Scale = new Vector2(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y);
+            Scale = new Vector3(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y, cell.CellInfo.Scale.Z);
             Color = new Color(Utilities.ReverseColor(cell.Color));
             GradientTopLeft = new Color(255, 255, 255, 255);
             GradientBottomLeft = new Color(255, 255, 255, 255);
@@ -179,28 +174,26 @@ namespace Shuriken.Models
                 anchorPoint.Y = (castnode.ImageCast.AnchorPoint.Y != 0 ? castnode.ImageCast.AnchorPoint.Y : castnode.ImageCast.Height) / framesize.Y;
                 if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorRight) == SWImageCast.EFlags.eFlags_AnchorRight)
                 {
-                    TopRight = new Vector2(anchorPoint.X, 0);
-                    BottomRight = new Vector2(anchorPoint.X, 0);
+                    Anchor = new Vector2(anchorPoint.X, 0);
                 }
                 else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorLeft) == SWImageCast.EFlags.eFlags_AnchorLeft)
                 {
-                    TopLeft = new Vector2(anchorPoint.X, 0);
-                    BottomLeft = new Vector2(anchorPoint.X, 0);
+                    Anchor = new Vector2(-anchorPoint.X, 0);
                 }
                 else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopRight) == SWImageCast.EFlags.eFlags_AnchorTopRight)
                 {
-                    TopRight = new Vector2(anchorPoint.X, anchorPoint.Y);
+                    Anchor = new Vector2(anchorPoint.X, anchorPoint.Y);
                 }
                 else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopLeft) == SWImageCast.EFlags.eFlags_AnchorTopLeft)
                 {
-                    TopLeft = new Vector2(anchorPoint.X, 0);
-                    TopRight = new Vector2(0, anchorPoint.Y);
+                    Anchor = new Vector2(-anchorPoint.X, anchorPoint.Y);
                 }
 
                 //Flags = (uint)cast.Flags;
 
                 Font = null;
                 FontCharacters = castnode.ImageCast.FontInfo.Characters;
+                FontSpacingCorrection = (uint)Math.Abs(castnode.ImageCast.FontInfo.FontSpacingCorrection);
 
                 Width = (uint)castnode.ImageCast.Width;
                 Height = (uint)castnode.ImageCast.Height;
@@ -247,11 +240,6 @@ namespace Shuriken.Models
             ZIndex = 0;
             Children = new ObservableCollection<UICast>();
 
-            TopLeft = new Vector2();
-            BottomLeft = new Vector2();
-            TopRight = new Vector2();
-            BottomRight = new Vector2();
-
             Field2C = 0;
             Field34 = 0;
             Flags = 0;
@@ -261,21 +249,22 @@ namespace Shuriken.Models
             FontCharacters = "";
 
             Field4C = 0;
-            Width = 0;
-            Height = 0;
+            Width = 64;
+            Height = 64;
             Field58 = 0;
             Field5C = 0;
 
-            Offset = new Vector2();
+            Anchor = new Vector2();
+            Offset = new Vector2(0.5f, 0.5f);
 
             Field68 = 0;
             Field6C = 0;
-            Field70 = 0;
+            FontSpacingCorrection = 0;
 
             InfoField00 = 0;
             Translation = new Vector2();
             Rotation = 0;
-            Scale = new Vector2(1.0f, 1.0f);
+            Scale = new Vector3(1.0f, 1.0f, 1.0f);
             InfoField18 = 0;
             Color = new Color(255, 255, 255, 255);
             GradientTopLeft = new Color(255, 255, 255, 255);
@@ -286,9 +275,9 @@ namespace Shuriken.Models
             InfoField34 = 0;
             InfoField38 = 0;
 
-            Sprites = new ObservableCollection<int>();
-            for (int i = 0; i < 32; ++i)
-                Sprites.Add(-1);
+            Sprites = new ObservableCollection<int>(Enumerable.Repeat(-1, 32).ToList());
+
+            DefaultSprite = 0;
         }
 
         public UICast(UICast c)
@@ -301,10 +290,7 @@ namespace Shuriken.Models
             ZIndex = ZIndex;
             Children = new ObservableCollection<UICast>(c.Children);
 
-            TopLeft = new Vector2(c.TopLeft);
-            BottomLeft = new Vector2(c.BottomLeft);
-            TopRight = new Vector2(c.TopRight);
-            BottomRight = new Vector2(c.BottomRight);
+            Anchor = new Vector2(Anchor);
 
             Field2C = c.Field2C;
             Field34 = c.Field34;
@@ -324,12 +310,12 @@ namespace Shuriken.Models
 
             Field68 = c.Field68;
             Field6C = c.Field6C;
-            Field70 = c.Field70;
+            FontSpacingCorrection = c.FontSpacingCorrection;
 
             InfoField00 = c.InfoField00;
             Translation = new Vector2(c.Translation);
             Rotation = c.Rotation;
-            Scale = new Vector2(c.Scale);
+            Scale = new Vector3(c.Scale);
             InfoField18 = c.InfoField18;
             Color = new Color(c.Color);
             GradientTopLeft = new Color(c.GradientTopLeft);
