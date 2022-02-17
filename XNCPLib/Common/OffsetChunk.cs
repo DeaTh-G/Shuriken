@@ -15,16 +15,13 @@ namespace XNCPLib.Common
 
         public void Read(BinaryObjectReader reader)
         {
-            var origin = reader.Position;
             Header = reader.ReadObject<ChunkHeader>();
 
             OffsetLocationCount = reader.Read<uint>();
             Field0C = reader.Read<uint>();
 
-            for (int i = 0; i < OffsetLocationCount; ++i)
+            for (int i = 0; i < OffsetLocationCount + (OffsetLocationCount % 4); ++i)
                 OffsetLocations.Add(reader.Read<uint>());
-
-            reader.Seek(origin + Header.Size + 8, SeekOrigin.Begin);
         }
 
         public void Write(BinaryObjectWriter writer) { }
