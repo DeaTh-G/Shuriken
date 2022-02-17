@@ -5,12 +5,12 @@ using XNCPLib.Common;
 
 namespace XNCPLib.SWIF
 {
-    public class SWTextureListChunk : IBinarySerializable
+    public class SWTextureListChunkV1 : IBinarySerializable
     {
         public ChunkHeader Header { get; set; } = new();
         public uint ListOffset { get; set; }
         public uint ListCount { get; set; }
-        public List<SWTextureList> TextureLists { get; set; } = new();
+        public List<SWTextureListV1> TextureLists { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -22,7 +22,7 @@ namespace XNCPLib.SWIF
             reader.ReadAtOffset(origin + ListOffset, () =>
             {
                 for (int i = 0; i < ListCount; i++)
-                    TextureLists.Add(reader.ReadObject<SWTextureList>());
+                    TextureLists.Add(reader.ReadObject<SWTextureListV1>());
             });
 
             reader.Seek(origin + Header.Size + 8, SeekOrigin.Begin);

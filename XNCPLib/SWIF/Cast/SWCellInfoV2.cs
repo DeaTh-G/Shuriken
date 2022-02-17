@@ -3,22 +3,27 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Cast
 {
-    public class SWCellInfo : IBinarySerializable
+    public class SWCellInfoV2 : IBinarySerializable
     {
+        public uint Field00 { get; set; }
         public Vector3 Position { get; set; }
-        public uint Field0C { get; set; }
-        public uint Field10 { get; set; }
+        public ulong Field10 { get; set; }
+        public ulong Field18 { get; set; }
         public uint Rotation { get; set; }
         public Vector3 Scale { get; set; }
+        public uint Field30 { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
+            Field00 = reader.Read<uint>();
             Position = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
-            Field0C = reader.Read<uint>();
-            Field10 = reader.Read<uint>();
+            Field10 = reader.Read<ulong>();
+            Field18 = reader.Read<ulong>();
             Rotation = reader.Read<uint>();
 
             Scale = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
+            
+            Field30 = reader.Read<uint>();
         }
 
         public void Write(BinaryObjectWriter writer) { }

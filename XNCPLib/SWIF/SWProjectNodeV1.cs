@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWProjectNode : IBinarySerializable
+    public class SWProjectNodeV1 : IBinarySerializable
     {
         public string Name { get; set; }
         public ushort SceneCount { get; set; }
@@ -13,14 +13,14 @@ namespace XNCPLib.SWIF
         public uint SceneOffset { get; set; }
         public uint TextureListOffset { get; set; }
         public uint FontListOffset { get; set; }
-        public SWCamera Camera { get; set; } = new();
+        public SWCameraV1 Camera { get; set; } = new();
         public uint StartFrame { get; set; }
         public uint EndFrame { get; set; }
         public float FrameRate { get; set; }
         public uint Field5C { get; set; }
-        public List<SWScene> Scenes { get; set; } = new();
-        public List<SWTextureList> TextureLists { get; set; } = new();
-        public List<SWFontList> FontLists { get; set; } = new();
+        public List<SWSceneV1> Scenes { get; set; } = new();
+        public List<SWTextureListV1> TextureLists { get; set; } = new();
+        public List<SWFontListV1> FontLists { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -35,7 +35,7 @@ namespace XNCPLib.SWIF
             TextureListOffset = reader.Read<uint>();
             FontListOffset = reader.Read<uint>();
 
-            Camera = reader.ReadObject<SWCamera>();
+            Camera = reader.ReadObject<SWCameraV1>();
 
             StartFrame = reader.Read<uint>();
             EndFrame = reader.Read<uint>();
@@ -45,19 +45,19 @@ namespace XNCPLib.SWIF
             reader.ReadAtOffset(SceneOffset, () =>
             {
                 for (int i = 0; i < SceneCount; i++)
-                    Scenes.Add(reader.ReadObject<SWScene>());
+                    Scenes.Add(reader.ReadObject<SWSceneV1>());
             });
 
             reader.ReadAtOffset(TextureListOffset, () =>
             {
                 for (int i = 0; i < TextureListCount; i++)
-                    TextureLists.Add(reader.ReadObject<SWTextureList>());
+                    TextureLists.Add(reader.ReadObject<SWTextureListV1>());
             });
 
             reader.ReadAtOffset(FontListOffset, () =>
             {
                 for (int i = 0; i < FontListCount; i++)
-                    FontLists.Add(reader.ReadObject<SWFontList>());
+                    FontLists.Add(reader.ReadObject<SWFontListV1>());
             });
         }
 

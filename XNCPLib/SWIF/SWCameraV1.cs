@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWCamera : IBinarySerializable
+    public class SWCameraV1 : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID;

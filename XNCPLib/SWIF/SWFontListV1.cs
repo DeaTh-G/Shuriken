@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWFontList : IBinarySerializable
+    public class SWFontListV1 : IBinarySerializable
     {
         public string Name { get; set; }
         public uint Field04 { get; set; }

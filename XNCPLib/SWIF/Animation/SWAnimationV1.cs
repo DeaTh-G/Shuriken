@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimation : IBinarySerializable
+    public class SWAnimationV1 : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID { get; set; }

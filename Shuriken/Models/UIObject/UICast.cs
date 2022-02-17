@@ -141,7 +141,7 @@ namespace Shuriken.Models
             DefaultSprite = 0;
         }
 
-        public UICast(SWCastNode castnode, SWCell cell, System.Numerics.Vector2 framesize, string name, int index)
+        public UICast(SWCastNodeV2 castnode, SWCellV2 cell, System.Numerics.Vector2 framesize, string name, int index)
         {
             Name = name;
             IsEnabled = true;
@@ -168,58 +168,42 @@ namespace Shuriken.Models
 
             if ((castnode.Flags & 0xF) == 1)
             {
-                Type = (castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
+                Type = (castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
                 
                 Vector2 anchorPoint = new Vector2();
                 anchorPoint.X = (castnode.ImageCast.AnchorPoint.X != 0 ? castnode.ImageCast.AnchorPoint.X : castnode.ImageCast.Width) / framesize.X;
                 anchorPoint.Y = (castnode.ImageCast.AnchorPoint.Y != 0 ? castnode.ImageCast.AnchorPoint.Y : castnode.ImageCast.Height) / framesize.Y;
-                switch (castnode.ImageCast.Flags & (SWImageCast.EFlags)0xFF0000)
+                switch (castnode.ImageCast.Flags & (SWImageCastV2.EFlags)0xFF0000)
                 {
-                    case SWImageCast.EFlags.eFlags_AnchorBottomRight:
+                    case SWImageCastV2.EFlags.eFlags_AnchorBottomRight:
                         Anchor = new Vector2(anchorPoint.X, -anchorPoint.Y);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorBottom:
+                    case SWImageCastV2.EFlags.eFlags_AnchorBottom:
                         Anchor = new Vector2(0, -anchorPoint.Y);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorBottomLeft:
+                    case SWImageCastV2.EFlags.eFlags_AnchorBottomLeft:
                         Anchor = new Vector2(-anchorPoint.X, -anchorPoint.Y);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorRight:
+                    case SWImageCastV2.EFlags.eFlags_AnchorRight:
                         Anchor = new Vector2(anchorPoint.X, 0);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorCenter:
+                    case SWImageCastV2.EFlags.eFlags_AnchorCenter:
                         Anchor = new Vector2(0, 0);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorLeft:
+                    case SWImageCastV2.EFlags.eFlags_AnchorLeft:
                         Anchor = new Vector2(-anchorPoint.X, 0);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorTopRight:
+                    case SWImageCastV2.EFlags.eFlags_AnchorTopRight:
                         Anchor = new Vector2(anchorPoint.X, anchorPoint.Y);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorTop:
+                    case SWImageCastV2.EFlags.eFlags_AnchorTop:
                         Anchor = new Vector2(0, anchorPoint.Y);
                         break;
-                    case SWImageCast.EFlags.eFlags_AnchorTopLeft:
+                    case SWImageCastV2.EFlags.eFlags_AnchorTopLeft:
                         Anchor = new Vector2(-anchorPoint.X, anchorPoint.Y);
                         break;
                     default:
                         break;
-                }
-                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorRight) == SWImageCast.EFlags.eFlags_AnchorRight)
-                {
-                    Anchor = new Vector2(anchorPoint.X, 0);
-                }
-                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorLeft) == SWImageCast.EFlags.eFlags_AnchorLeft)
-                {
-                    Anchor = new Vector2(-anchorPoint.X, 0);
-                }
-                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopRight) == SWImageCast.EFlags.eFlags_AnchorTopRight)
-                {
-                    Anchor = new Vector2(anchorPoint.X, anchorPoint.Y);
-                }
-                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorTopLeft) == SWImageCast.EFlags.eFlags_AnchorTopLeft)
-                {
-                    Anchor = new Vector2(-anchorPoint.X, anchorPoint.Y);
                 }
 
                 //Flags = (uint)cast.Flags;
@@ -231,22 +215,22 @@ namespace Shuriken.Models
                 Width = (uint)castnode.ImageCast.Width;
                 Height = (uint)castnode.ImageCast.Height;
 
-                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_RotateLeft) == SWImageCast.EFlags.eFlags_RotateLeft)
+                if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_RotateLeft) == SWImageCastV2.EFlags.eFlags_RotateLeft)
                 {
                     Width = (uint)castnode.ImageCast.Height;
                     Height = (uint)castnode.ImageCast.Width;
                     Rotation += 90;
                 }
 
-                if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontally) == SWImageCast.EFlags.eFlags_FlipHorizontally)
+                if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipHorizontally) == SWImageCastV2.EFlags.eFlags_FlipHorizontally)
                 {
                     Scale.X = -Scale.X;
                 }
-                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipVertically) == SWImageCast.EFlags.eFlags_FlipVertically)
+                else if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipVertically) == SWImageCastV2.EFlags.eFlags_FlipVertically)
                 {
                     Scale.Y = -Scale.Y;
                 }
-                else if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically) == SWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically)
+                else if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipHorizontallyAndVertically) == SWImageCastV2.EFlags.eFlags_FlipHorizontallyAndVertically)
                 {
                     Scale.X = -Scale.X;
                     Scale.Y = -Scale.Y;

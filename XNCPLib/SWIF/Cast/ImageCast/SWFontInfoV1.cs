@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Cast.ImageCast
 {
-    public class SWFontInfo : IBinarySerializable
+    public class SWFontInfoV1 : IBinarySerializable
     {
         public uint Field00 { get; set; }
         public uint FontListIndex { get; set; }
@@ -15,7 +15,7 @@ namespace XNCPLib.SWIF.Cast.ImageCast
         public ushort Field1E { get; set; }
         public uint FontListOffset { get; set; }
         public string Characters { get; set; }
-        public SWFontList FontList { get; set; } = new();
+        public SWFontListV1 FontList { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -29,7 +29,7 @@ namespace XNCPLib.SWIF.Cast.ImageCast
             Field1E = reader.Read<ushort>();
             FontListOffset = reader.Read<uint>();
 
-            FontList = reader.ReadObjectAtOffset<SWFontList>(FontListOffset);
+            FontList = reader.ReadObjectAtOffset<SWFontListV1>(FontListOffset);
             reader.ReadAtOffset(CharacterListOffset, () => { Characters = reader.ReadString(StringBinaryFormat.NullTerminated); });
         }
 

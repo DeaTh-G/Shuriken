@@ -5,7 +5,7 @@ using XNCPLib.SWIF.Animation;
 
 namespace XNCPLib.SWIF
 {
-    public class SWLayer : IBinarySerializable
+    public class SWLayerV1 : IBinarySerializable
     {
         public string Name { get; set; }
         public uint ID { get; set; }
@@ -17,9 +17,9 @@ namespace XNCPLib.SWIF
         public uint AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public List<SWCastNode> CastNodes { get; set; } = new();
-        public List<SWCell> Cells { get; set; } = new();
-        public List<SWAnimation> Animations { get; set; } = new();
+        public List<SWCastNodeV1> CastNodes { get; set; } = new();
+        public List<SWCellV1> Cells { get; set; } = new();
+        public List<SWAnimationV1> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -40,19 +40,19 @@ namespace XNCPLib.SWIF
             reader.ReadAtOffset(CastNodeOffset, () =>
             {
                 for (int i = 0; i < CastCellCount; i++)
-                    CastNodes.Add(reader.ReadObject<SWCastNode>());
+                    CastNodes.Add(reader.ReadObject<SWCastNodeV1>());
             });
 
             reader.ReadAtOffset(CellOffset, () =>
             {
                 for (int i = 0; i < CastCellCount; i++)
-                    Cells.Add(reader.ReadObject<SWCell>());
+                    Cells.Add(reader.ReadObject<SWCellV1>());
             });
 
             reader.ReadAtOffset(AnimationOffset, () =>
             {
                 for (int i = 0; i < AnimationCount; i++)
-                    Animations.Add(reader.ReadObject<SWAnimation>());
+                    Animations.Add(reader.ReadObject<SWAnimationV1>());
             });
         }
 

@@ -5,7 +5,7 @@ using XNCPLib.SWIF.Cast.ImageCast;
 
 namespace XNCPLib.SWIF.Cast
 {
-    public class SWImageCast : IBinarySerializable
+    public class SWImageCastV1 : IBinarySerializable
     {
         public enum EFlags : uint
         {
@@ -47,7 +47,7 @@ namespace XNCPLib.SWIF.Cast
         public uint Field38 { get; set; }
         public uint Field3C { get; set; }
         public List<SWPatternInfo> PatternInfoList { get; set; } = new();
-        public SWFontInfo FontInfo { get; set; } = new();
+        public SWFontInfoV1 FontInfo { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -87,7 +87,7 @@ namespace XNCPLib.SWIF.Cast
             });
 
             if ((Flags & (EFlags)0xFFF) == EFlags.eFlags_UseFont)
-                FontInfo = reader.ReadObjectAtOffset<SWFontInfo>(FontInfoOffset);
+                FontInfo = reader.ReadObjectAtOffset<SWFontInfoV1>(FontInfoOffset);
         }
 
         public void Write(BinaryObjectWriter writer) { }

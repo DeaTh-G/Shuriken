@@ -62,7 +62,7 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        public UIScene(SWProjectNode project, SWScene scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        public UIScene(SWProjectNodeV2 project, SWSceneV2 scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
             AspectRatio = scene.FrameSize.X / scene.FrameSize.Y;
@@ -203,7 +203,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void ProcessSWCasts(SWScene scene, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        private void ProcessSWCasts(SWSceneV2 scene, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
         {
             // Create groups
             for (int g = 0; g < scene.LayerCount; ++g)
@@ -218,7 +218,7 @@ namespace Shuriken.Models
             List<UICast> tempCasts = new List<UICast>();
             for (int g = 0; g < Groups.Count; ++g)
             {
-                for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
+                for (int c = 0; c < (int)scene.Layers[g].CastCellCount; ++c)
                 {
                     UICast cast = new UICast(scene.Layers[g].CastNodes[c], scene.Layers[g].Cells[c],
                         scene.FrameSize, scene.Layers[g].CastNodes[c].Name, c);
@@ -260,7 +260,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void CreateHierarchyTree(int group, List<SWCastNode> casts, List<UICast> lyrs)
+        private void CreateHierarchyTree(int group, List<SWCastNodeV2> casts, List<UICast> lyrs)
         {
             int next = 0;
             while (next != -1)
@@ -296,7 +296,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void BuildTree(int c, List<SWCastNode> casts, List<UICast> lyrs, UICast parent)
+        private void BuildTree(int c, List<SWCastNodeV2> casts, List<UICast> lyrs, UICast parent)
         {
             int childIndex = casts[c].ChildIndex;
             if (childIndex != -1)
