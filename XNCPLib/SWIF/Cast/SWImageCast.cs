@@ -56,10 +56,17 @@ namespace XNCPLib.SWIF.Cast
             Height = reader.Read<float>();
             AnchorPoint = new Vector2(reader.Read<float>(), reader.Read<float>());
 
-            GradientTopLeft = reader.Read<uint>();
-            GradientBottomLeft = reader.Read<uint>();
-            GradientTopRight = reader.Read<uint>();
-            GradientBottomRight = reader.Read<uint>();
+            for (int i = 0; i < 4; i++)
+                GradientTopLeft |= (uint)(reader.Read<byte>() << 8 * i);
+
+            for (int i = 0; i < 4; i++)
+                GradientBottomLeft |= (uint)(reader.Read<byte>() << 8 * i);
+
+            for (int i = 0; i < 4; i++)
+                GradientTopRight |= (uint)(reader.Read<byte>() << 8 * i);
+
+            for (int i = 0; i < 4; i++)
+                GradientBottomRight |= (uint)(reader.Read<byte>() << 8 * i);
 
             Field24 = reader.Read<short>();
             Field26 = reader.Read<short>();

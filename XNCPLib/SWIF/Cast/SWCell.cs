@@ -17,7 +17,9 @@ namespace XNCPLib.SWIF.Cast
 
         public void Read(BinaryObjectReader reader)
         {
-            Color = reader.Read<uint>();
+            for (int i = 0; i < 4; i++)
+                Color |= (uint)(reader.Read<byte>() << 8 * i);
+            
             Field04 = reader.Read<byte>();
             Field05 = reader.Read<byte>();
             Field06 = reader.Read<byte>();
