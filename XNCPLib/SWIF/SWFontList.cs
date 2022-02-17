@@ -33,7 +33,7 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < FontMappingCount; i++)
                     FontMappings.Add(reader.ReadObject<SWFontMapping>());
-            }, true);
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

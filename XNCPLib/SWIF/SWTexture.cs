@@ -34,7 +34,7 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < SubImageCount; i++)
                     SubImages.Add(reader.ReadObject<SWSubImage>());
-            }, true);
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

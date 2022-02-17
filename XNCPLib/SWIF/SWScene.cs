@@ -43,13 +43,13 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < LayerCount; i++)
                     Layers.Add(reader.ReadObject<SWLayer>());
-            }, true);
+            });
 
             reader.ReadAtOffset(CameraOffset, () =>
             {
                 for (int i = 0; i < CameraCount; i++)
                     Cameras.Add(reader.ReadObject<SWCamera>());
-            }, true);
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

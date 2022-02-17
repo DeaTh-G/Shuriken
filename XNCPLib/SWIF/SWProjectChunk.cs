@@ -15,16 +15,15 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
+            var origin = reader.Position;
             Header = reader.ReadObject<ChunkHeader>();
-            reader.PushOffsetOrigin();
 
             ProjectNodeOffset = reader.Read<uint>();
             Field0C = reader.Read<uint>();
 
-            reader.ReadAtOffset(ProjectNodeOffset - 8, () => { ProjectNode = reader.ReadObject<SWProjectNode>(); });
+            ProjectNode = reader.ReadObjectAtOffset<SWProjectNode>(origin + ProjectNodeOffset);
 
-            reader.Seek(reader.GetOffsetOrigin() + Header.Size, SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.Seek(origin + Header.Size + 8, SeekOrigin.Begin);
         }
 
         public void Write(BinaryObjectWriter writer) { }

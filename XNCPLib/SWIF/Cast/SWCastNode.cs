@@ -38,7 +38,7 @@ namespace XNCPLib.SWIF.Cast
                         default:
                             break;
                     }
-                }, true);
+                });
             }
         }
 

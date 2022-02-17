@@ -22,8 +22,7 @@ namespace XNCPLib.SWIF.Animation
 
         public void Read(BinaryObjectReader reader)
         {
-            uint nameOffset = reader.Read<uint>();
-            Name = reader.ReadStringOffset(nameOffset, true);
+            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
 
             ID = reader.Read<uint>();
 
@@ -38,13 +37,11 @@ namespace XNCPLib.SWIF.Animation
             Field1A = reader.Read<byte>();
             Field1B = reader.Read<byte>();
 
-            reader.PushOffsetOrigin();
-            reader.Seek(AnimationLinkOffset, SeekOrigin.Begin);
-            for (int i = 0; i < AnimationLinkCount; i++)
-                AnimationLinks.Add(reader.ReadObject<SWAnimationLink>());
-
-            reader.Seek(reader.GetOffsetOrigin(), SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.ReadAtOffset(AnimationLinkOffset, () =>
+            {
+                for (int i = 0; i < AnimationLinkCount; i++)
+                    AnimationLinks.Add(reader.ReadObject<SWAnimationLink>());
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

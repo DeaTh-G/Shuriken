@@ -24,7 +24,7 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < TextureCount; i++)
                     Textures.Add(reader.ReadObject<SWTexture>());
-            }, true);
+            });
 
             Field0C = reader.Read<uint>();
         }

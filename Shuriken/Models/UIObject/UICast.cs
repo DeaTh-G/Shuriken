@@ -173,6 +173,38 @@ namespace Shuriken.Models
                 Vector2 anchorPoint = new Vector2();
                 anchorPoint.X = (castnode.ImageCast.AnchorPoint.X != 0 ? castnode.ImageCast.AnchorPoint.X : castnode.ImageCast.Width) / framesize.X;
                 anchorPoint.Y = (castnode.ImageCast.AnchorPoint.Y != 0 ? castnode.ImageCast.AnchorPoint.Y : castnode.ImageCast.Height) / framesize.Y;
+                switch (castnode.ImageCast.Flags & (SWImageCast.EFlags)0xFF0000)
+                {
+                    case SWImageCast.EFlags.eFlags_AnchorBottomRight:
+                        Anchor = new Vector2(anchorPoint.X, -anchorPoint.Y);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorBottom:
+                        Anchor = new Vector2(0, -anchorPoint.Y);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorBottomLeft:
+                        Anchor = new Vector2(-anchorPoint.X, -anchorPoint.Y);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorRight:
+                        Anchor = new Vector2(anchorPoint.X, 0);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorCenter:
+                        Anchor = new Vector2(0, 0);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorLeft:
+                        Anchor = new Vector2(-anchorPoint.X, 0);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorTopRight:
+                        Anchor = new Vector2(anchorPoint.X, anchorPoint.Y);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorTop:
+                        Anchor = new Vector2(0, anchorPoint.Y);
+                        break;
+                    case SWImageCast.EFlags.eFlags_AnchorTopLeft:
+                        Anchor = new Vector2(-anchorPoint.X, anchorPoint.Y);
+                        break;
+                    default:
+                        break;
+                }
                 if ((castnode.ImageCast.Flags & SWImageCast.EFlags.eFlags_AnchorRight) == SWImageCast.EFlags.eFlags_AnchorRight)
                 {
                     Anchor = new Vector2(anchorPoint.X, 0);

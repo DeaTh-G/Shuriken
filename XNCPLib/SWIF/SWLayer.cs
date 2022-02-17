@@ -42,19 +42,19 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < CastCellCount; i++)
                     CastNodes.Add(reader.ReadObject<SWCastNode>());
-            }, true);
+            });
 
             reader.ReadAtOffset(CellOffset, () =>
             {
                 for (int i = 0; i < CastCellCount; i++)
                     Cells.Add(reader.ReadObject<SWCell>());
-            }, true);
+            });
 
             reader.ReadAtOffset(AnimationOffset, () =>
             {
                 for (int i = 0; i < AnimationCount; i++)
                     Animations.Add(reader.ReadObject<SWAnimation>());
-            }, true);
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

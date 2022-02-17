@@ -77,10 +77,10 @@ namespace XNCPLib.SWIF.Cast
             {
                 for (int i = 0; i < PatternInfoCount; i++)
                     PatternInfoList.Add(reader.ReadObject<SWPatternInfo>());
-            }, true);
+            });
 
             if ((Flags & (EFlags)0xFFF) == EFlags.eFlags_UseFont)
-                reader.ReadAtOffset(FontInfoOffset, () => { FontInfo = reader.ReadObject<SWFontInfo>(); }, true);
+                FontInfo = reader.ReadObjectAtOffset<SWFontInfo>(FontInfoOffset);
         }
 
         public void Write(BinaryObjectWriter writer) { }

@@ -47,19 +47,19 @@ namespace XNCPLib.SWIF
             {
                 for (int i = 0; i < SceneCount; i++)
                     Scenes.Add(reader.ReadObject<SWScene>());
-            }, true);
+            });
 
             reader.ReadAtOffset(TextureListOffset, () =>
             {
                 for (int i = 0; i < TextureListCount; i++)
                     TextureLists.Add(reader.ReadObject<SWTextureList>());
-            }, true);
+            });
 
             reader.ReadAtOffset(FontListOffset, () =>
             {
                 for (int i = 0; i < FontListCount; i++)
                     FontLists.Add(reader.ReadObject<SWFontList>());
-            }, true);
+            });
         }
 
         public void Write(BinaryObjectWriter writer) { }

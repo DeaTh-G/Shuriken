@@ -29,8 +29,8 @@ namespace XNCPLib.SWIF.Cast.ImageCast
             Field1E = reader.Read<ushort>();
             FontListOffset = reader.Read<uint>();
 
-            reader.ReadAtOffset(FontListOffset, () => { FontList = reader.ReadObject<SWFontList>(); }, true);
-            reader.ReadAtOffset(CharacterListOffset, () => { Characters = reader.ReadString(StringBinaryFormat.NullTerminated); }, true);
+            FontList = reader.ReadObjectAtOffset<SWFontList>(FontListOffset);
+            reader.ReadAtOffset(CharacterListOffset, () => { Characters = reader.ReadString(StringBinaryFormat.NullTerminated); });
         }
 
         public void Write(BinaryObjectWriter writer) { }

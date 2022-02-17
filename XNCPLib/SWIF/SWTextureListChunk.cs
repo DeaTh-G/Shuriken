@@ -16,19 +16,18 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
+            var origin = reader.Position;
             Header = reader.ReadObject<ChunkHeader>();
-            reader.PushOffsetOrigin();
-
+            
             ListOffset = reader.Read<uint>();
             ListCount = reader.Read<uint>();
-            reader.ReadAtOffset(ListOffset - 8, () =>
+            reader.ReadAtOffset(origin + ListOffset, () =>
             {
                 for (int i = 0; i < ListCount; i++)
                     TextureLists.Add(reader.ReadObject<SWTextureList>());
             });
 
-            reader.Seek(reader.GetOffsetOrigin() + Header.Size, SeekOrigin.Begin);
-            reader.PopOffsetOrigin();
+            reader.Seek(origin + Header.Size + 8, SeekOrigin.Begin);
         }
 
         public void Write(BinaryObjectWriter writer) { }
