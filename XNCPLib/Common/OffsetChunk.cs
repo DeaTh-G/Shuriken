@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Amicitia.IO.Binary;
 
 namespace XNCPLib.Common
@@ -17,8 +18,10 @@ namespace XNCPLib.Common
             OffsetLocationCount = reader.Read<uint>();
             Field0C = reader.Read<uint>();
 
-            for (int i = 0; i < OffsetLocationCount + (OffsetLocationCount % 4); ++i)
+            for (int i = 0; i < OffsetLocationCount; ++i)
                 OffsetLocations.Add(reader.Read<uint>());
+
+            reader.Seek(reader.Position + (0x10 - reader.Position % 16), SeekOrigin.Begin);
         }
 
         public void Write(BinaryObjectWriter writer) { }

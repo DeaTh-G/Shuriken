@@ -1,4 +1,5 @@
 ﻿using Amicitia.IO.Binary;
+using System.IO;
 using XNCPLib.Common;
 
 namespace XNCPLib.SWIF
@@ -15,9 +16,14 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
+            var origin = reader.Position;
             Header = reader.ReadObject<ChunkHeader>();
             if (Header.Size == 402653184)
+            {
                 reader.Endianness = Endianness.Big;
+                reader.Seek(origin, SeekOrigin.Begin);
+                Header = reader.ReadObject<ChunkHeader>();
+            }
 
             ChunkCount = reader.Read<uint>();
             NextChunkOffset = reader.Read<uint>();
