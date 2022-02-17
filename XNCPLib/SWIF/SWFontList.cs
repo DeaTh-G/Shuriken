@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Amicitia.IO.Binary;
-using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
@@ -18,7 +17,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
+            reader.ReadOffset(() => { Name = reader.ReadString(StringBinaryFormat.NullTerminated); });
             Field04 = reader.Read<uint>();
             Field08 = reader.Read<uint>();
 

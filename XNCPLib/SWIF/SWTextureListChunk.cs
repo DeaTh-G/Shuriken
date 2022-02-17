@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using Amicitia.IO.Binary;
-using Amicitia.IO.Binary.Extensions;
-using XNCPLib.Extensions;
 using XNCPLib.Common;
 
 namespace XNCPLib.SWIF

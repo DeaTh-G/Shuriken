@@ -1,5 +1,4 @@
 ﻿using Amicitia.IO.Binary;
-using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF.Cast
 {
@@ -16,7 +15,7 @@ namespace XNCPLib.SWIF.Cast
 
         public void Read(BinaryObjectReader reader)
         {
-            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
+            reader.ReadOffset(() => { Name = reader.ReadString(StringBinaryFormat.NullTerminated); });
 
             ID = reader.Read<int>();
             Flags = reader.Read<uint>();

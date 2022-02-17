@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Amicitia.IO.Binary;
-using XNCPLib.Extensions;
 using XNCPLib.SWIF.Cast;
 using XNCPLib.SWIF.Animation;
 
@@ -24,7 +23,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
+            reader.ReadOffset(() => { Name = reader.ReadString(StringBinaryFormat.NullTerminated); });
             ID = reader.Read<uint>();
             Flags = reader.Read<uint>();
 

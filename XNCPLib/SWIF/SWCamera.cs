@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Amicitia.IO.Binary;
-using XNCPLib.Extensions;
 
 namespace XNCPLib.SWIF
 {
@@ -18,7 +17,7 @@ namespace XNCPLib.SWIF
 
         public void Read(BinaryObjectReader reader)
         {
-            Name = reader.ReadStringOffset(reader.Read<uint>(), true);
+            reader.ReadOffset(() => { Name = reader.ReadString(StringBinaryFormat.NullTerminated); });
             ID = reader.Read<uint>();
 
             Position = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
