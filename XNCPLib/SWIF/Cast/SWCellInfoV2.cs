@@ -3,12 +3,14 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Cast
 {
-    public class SWCellInfoV2 : IBinarySerializable
+    public class SWCellInfoV2 : ISWCellInfo
     {
         public uint Field00 { get; set; }
         public Vector3 Position { get; set; }
-        public ulong Field10 { get; set; }
-        public ulong Field18 { get; set; }
+        public uint Field10 { get; set; }
+        public uint Field14 { get; set; }
+        public uint Field18 { get; set; }
+        public uint Field1C { get; set; }
         public uint Rotation { get; set; }
         public Vector3 Scale { get; set; }
         public uint Field30 { get; set; }
@@ -17,8 +19,10 @@ namespace XNCPLib.SWIF.Cast
         {
             Field00 = reader.Read<uint>();
             Position = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());
-            Field10 = reader.Read<ulong>();
-            Field18 = reader.Read<ulong>();
+            Field10 = reader.Read<uint>();
+            Field14 = reader.Read<uint>();
+            Field18 = reader.Read<uint>();
+            Field1C = reader.Read<uint>();
             Rotation = reader.Read<uint>();
 
             Scale = new Vector3(reader.Read<float>(), reader.Read<float>(), reader.Read<float>());

@@ -2,16 +2,16 @@
 
 namespace XNCPLib.SWIF.Cast
 {
-    public class SWCastNodeV1 : IBinarySerializable
+    public class SWCastNodeV1 : ISWCastNode
     {
         public string Name { get; set; }
         public int ID { get; set; }
         public uint Flags { get; set; }
-        public uint CastOffset { get; set; }
+        public long CastOffset { get; set; }
         public short ChildIndex { get; set; }
         public short NextIndex { get; set; }
-        public uint Field14 { get; set; }
-        public SWImageCastV1 ImageCast { get; set; } = new();
+        public uint Field1C { get; set; }
+        public ISWImageCast ImageCast { get; set; } = new SWImageCastV1();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -20,10 +20,10 @@ namespace XNCPLib.SWIF.Cast
             ID = reader.Read<int>();
             Flags = reader.Read<uint>();
 
-            CastOffset = reader.Read<uint>();
+            CastOffset = reader.ReadOffsetValue();
             ChildIndex = reader.Read<short>();
             NextIndex = reader.Read<short>();
-            Field14 = reader.Read<uint>();
+            Field1C = reader.Read<uint>();
 
             if (CastOffset != 0)
             {

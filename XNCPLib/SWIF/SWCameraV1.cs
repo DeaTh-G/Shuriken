@@ -3,17 +3,17 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWCameraV1 : IBinarySerializable
+    public class SWCameraV1 : ISWCamera
     {
         public string Name { get; set; }
-        public uint ID;
+        public uint ID { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 LookAt { get; set; }
         public uint Flags { get; set; }
         public float RangeIn { get; set; }
         public float RangeOut { get; set; }
-        public uint Field2C { get; set; }
-        public uint Field30 { get; set; }
+        public uint Field48 { get; set; }
+        public uint Field4C { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -27,8 +27,8 @@ namespace XNCPLib.SWIF
             RangeIn = reader.Read<float>();
             RangeOut = reader.Read<float>();
 
-            Field2C = reader.Read<uint>();
-            Field30 = reader.Read<uint>();
+            Field48 = reader.Read<uint>();
+            Field4C = reader.Read<uint>();
         }
 
         public void Write(BinaryObjectWriter writer) { }

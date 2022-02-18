@@ -3,30 +3,30 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWFontListV1 : IBinarySerializable
+    public class SWFontListV1 : ISWFontList
     {
         public string Name { get; set; }
-        public uint Field04 { get; set; }
         public uint Field08 { get; set; }
+        public uint Field0C { get; set; }
         public ushort FontMappingCount { get; set; }
-        public ushort Field0E { get; set; }
-        public uint FontMappingOffset { get; set; }
-        public uint Field14 { get; set; }
-        public uint Field18 { get; set; }
+        public ushort Field14 { get; set; }
+        public long FontMappingOffset { get; set; }
+        public uint Field20 { get; set; }
+        public uint Field24 { get; set; }
         public List<SWFontMapping> FontMappings { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
             reader.ReadOffset(() => { Name = reader.ReadString(StringBinaryFormat.NullTerminated); });
-            Field04 = reader.Read<uint>();
             Field08 = reader.Read<uint>();
+            Field0C = reader.Read<uint>();
 
             FontMappingCount = reader.Read<ushort>();
-            Field0E = reader.Read<ushort>();
-            FontMappingOffset = reader.Read<uint>();
+            Field14 = reader.Read<ushort>();
+            FontMappingOffset = reader.ReadOffsetValue();
 
-            Field14 = reader.Read<uint>();
-            Field18 = reader.Read<uint>();
+            Field20 = reader.Read<uint>();
+            Field24 = reader.Read<uint>();
 
             reader.ReadAtOffset(FontMappingOffset, () =>
             {

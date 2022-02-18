@@ -3,10 +3,10 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWCameraV2 : IBinarySerializable
+    public class SWCameraV2 : ISWCamera
     {
         public string Name { get; set; }
-        public uint ID;
+        public uint ID { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 LookAt { get; set; }
         public uint Field24 { get; set; }

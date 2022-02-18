@@ -4,14 +4,14 @@ using XNCPLib.Common;
 
 namespace XNCPLib.SWIF
 {
-    public class SWProjectChunkV2 : IBinarySerializable
+    public class SWProjectChunk : IBinarySerializable<uint>
     {
         public ChunkHeader Header { get; set; } = new();
         public uint ProjectNodeOffset { get; set; }
         public uint Field0C { get; set; }
-        public SWProjectNodeV2 ProjectNode { get; set; } = new();
+        public SWProjectNode ProjectNode { get; set; } = new();
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, uint version)
         {
             var origin = reader.Position;
             Header = reader.ReadObject<ChunkHeader>();
@@ -19,11 +19,11 @@ namespace XNCPLib.SWIF
             ProjectNodeOffset = reader.Read<uint>();
             Field0C = reader.Read<uint>();
 
-            ProjectNode = reader.ReadObjectAtOffset<SWProjectNodeV2>(origin + ProjectNodeOffset);
+            ProjectNode = reader.ReadObjectAtOffset<SWProjectNode, uint>(origin + ProjectNodeOffset, version);
 
             reader.Seek(origin + Header.Size + 8, SeekOrigin.Begin);
         }
 
-        public void Write(BinaryObjectWriter writer) { }
+        public void Write(BinaryObjectWriter writer, uint version) { }
     }
 }

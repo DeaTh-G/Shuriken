@@ -5,20 +5,20 @@ using XNCPLib.SWIF.Animation;
 
 namespace XNCPLib.SWIF
 {
-    public class SWLayerV1 : IBinarySerializable
+    public class SWLayerV1 : ISWLayer
     {
         public string Name { get; set; }
         public uint ID { get; set; }
         public uint Flags { get; set; }
-        public uint CastCellCount { get; set; }
-        public uint CastNodeOffset { get; set; }
-        public uint CellOffset { get; set; }
-        public uint AnimationCount { get; set; }
-        public uint AnimationOffset { get; set; }
+        public long CastCellCount { get; set; }
+        public long CastNodeOffset { get; set; }
+        public long CellOffset { get; set; }
+        public long AnimationCount { get; set; }
+        public long AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public List<SWCastNodeV1> CastNodes { get; set; } = new();
-        public List<SWCellV1> Cells { get; set; } = new();
+        public List<ISWCastNode> CastNodes { get; set; } = new();
+        public List<SWCell> Cells { get; set; } = new();
         public List<SWAnimationV1> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
@@ -27,12 +27,12 @@ namespace XNCPLib.SWIF
             ID = reader.Read<uint>();
             Flags = reader.Read<uint>();
 
-            CastCellCount = reader.Read<uint>();
-            CastNodeOffset = reader.Read<uint>();
-            CellOffset = reader.Read<uint>();
+            CastCellCount = reader.ReadOffsetValue();
+            CastNodeOffset = reader.ReadOffsetValue();
+            CellOffset = reader.ReadOffsetValue();
 
-            AnimationCount = reader.Read<uint>();
-            AnimationOffset = reader.Read<uint>();
+            AnimationCount = reader.ReadOffsetValue();
+            AnimationOffset = reader.ReadOffsetValue();
 
             Field20 = reader.Read<uint>();
             Field24 = reader.Read<uint>();
@@ -46,7 +46,7 @@ namespace XNCPLib.SWIF
             reader.ReadAtOffset(CellOffset, () =>
             {
                 for (int i = 0; i < CastCellCount; i++)
-                    Cells.Add(reader.ReadObject<SWCellV1>());
+                    Cells.Add(reader.ReadObject<SWCell, uint>(1));
             });
 
             reader.ReadAtOffset(AnimationOffset, () =>

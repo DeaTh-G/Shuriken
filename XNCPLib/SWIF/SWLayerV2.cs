@@ -5,21 +5,21 @@ using XNCPLib.SWIF.Animation;
 
 namespace XNCPLib.SWIF
 {
-    public class SWLayerV2 : IBinarySerializable
+    public class SWLayerV2 : ISWLayer
     {
         public string Name { get; set; }
         public uint ID { get; set; }
         public uint Flags { get; set; }
-        public ulong CastCellCount { get; set; }
-        public ulong CastNodeOffset { get; set; }
-        public ulong CellOffset { get; set; }
-        public ulong AnimationCount { get; set; }
-        public ulong AnimationOffset { get; set; }
+        public long CastCellCount { get; set; }
+        public long CastNodeOffset { get; set; }
+        public long CellOffset { get; set; }
+        public long AnimationCount { get; set; }
+        public long AnimationOffset { get; set; }
         public uint Field20 { get; set; }
         public uint Field24 { get; set; }
-        public ulong Field28 { get; set; }
-        public List<SWCastNodeV2> CastNodes { get; set; } = new();
-        public List<SWCellV2> Cells { get; set; } = new();
+        public long Field28 { get; set; }
+        public List<ISWCastNode> CastNodes { get; set; } = new();
+        public List<SWCell> Cells { get; set; } = new();
         public List<SWAnimationV2> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
@@ -28,32 +28,32 @@ namespace XNCPLib.SWIF
             ID = reader.Read<uint>();
             Flags = reader.Read<uint>();
 
-            CastCellCount = reader.Read<ulong>();
-            CastNodeOffset = reader.Read<ulong>();
-            CellOffset = reader.Read<ulong>();
+            CastCellCount = reader.ReadOffsetValue();
+            CastNodeOffset = reader.ReadOffsetValue();
+            CellOffset = reader.ReadOffsetValue();
 
-            AnimationCount = reader.Read<ulong>();
-            AnimationOffset = reader.Read<ulong>();
+            AnimationCount = reader.ReadOffsetValue();
+            AnimationOffset = reader.ReadOffsetValue();
 
             Field20 = reader.Read<uint>();
             Field24 = reader.Read<uint>();
-            Field28 = reader.Read<ulong>();
+            Field28 = reader.Read<long>();
 
-            reader.ReadAtOffset((long)CastNodeOffset, () =>
+            reader.ReadAtOffset(CastNodeOffset, () =>
             {
-                for (ulong i = 0; i < CastCellCount; i++)
+                for (long i = 0; i < CastCellCount; i++)
                     CastNodes.Add(reader.ReadObject<SWCastNodeV2>());
             });
 
-            reader.ReadAtOffset((long)CellOffset, () =>
+            reader.ReadAtOffset(CellOffset, () =>
             {
-                for (ulong i = 0; i < CastCellCount; i++)
-                    Cells.Add(reader.ReadObject<SWCellV2>());
+                for (long i = 0; i < CastCellCount; i++)
+                    Cells.Add(reader.ReadObject<SWCell, uint>(2));
             });
 
-            reader.ReadAtOffset((long)AnimationOffset, () =>
+            reader.ReadAtOffset(AnimationOffset, () =>
             {
-                for (ulong i = 0; i < AnimationCount; i++)
+                for (long i = 0; i < AnimationCount; i++)
                     Animations.Add(reader.ReadObject<SWAnimationV2>());
             });
         }

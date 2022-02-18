@@ -2,7 +2,7 @@
 
 namespace XNCPLib.SWIF.Cast
 {
-    public class SWCellV2 : IBinarySerializable
+    public class SWCell : IBinarySerializable<uint>
     {
         public uint Color { get; set; }
         public byte Field04 { get; set; }
@@ -13,9 +13,9 @@ namespace XNCPLib.SWIF.Cast
         public byte Field09 { get; set; }
         public byte Field0A { get; set; }
         public byte Field0B { get; set; }
-        public SWCellInfoV2 CellInfo { get; set; } = new();
+        public ISWCellInfo CellInfo { get; set; }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, uint version)
         {
             for (int i = 0; i < 4; i++)
                 Color |= (uint)(reader.Read<byte>() << 8 * i);
@@ -28,9 +28,13 @@ namespace XNCPLib.SWIF.Cast
             Field09 = reader.Read<byte>();
             Field0A = reader.Read<byte>();
             Field0B = reader.Read<byte>();
-            CellInfo = reader.ReadObject<SWCellInfoV2>();
+
+            if (version == 1)
+                CellInfo = reader.ReadObject<SWCellInfoV1>();
+            else if (version == 2)
+                CellInfo = reader.ReadObject<SWCellInfoV2>();
         }
 
-        public void Write(BinaryObjectWriter writer) { }
+        public void Write(BinaryObjectWriter writer, uint version) { }
     }
 }

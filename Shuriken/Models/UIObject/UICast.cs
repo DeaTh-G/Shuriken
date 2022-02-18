@@ -141,7 +141,7 @@ namespace Shuriken.Models
             DefaultSprite = 0;
         }
 
-        public UICast(SWCastNodeV2 castnode, SWCellV2 cell, System.Numerics.Vector2 framesize, string name, int index)
+        public UICast(ISWCastNode castnode, SWCell cell, System.Numerics.Vector2 framesize, string name, int index)
         {
             Name = name;
             IsEnabled = true;
@@ -168,38 +168,38 @@ namespace Shuriken.Models
 
             if ((castnode.Flags & 0xF) == 1)
             {
-                Type = (castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
+                Type = (castnode.ImageCast.Flags & ISWImageCast.EFlags.eFlags_UseFont) != 0 ? DrawType.Font : DrawType.Sprite;
                 
                 Vector2 anchorPoint = new Vector2();
                 anchorPoint.X = (castnode.ImageCast.AnchorPoint.X != 0 ? castnode.ImageCast.AnchorPoint.X : castnode.ImageCast.Width) / framesize.X;
                 anchorPoint.Y = (castnode.ImageCast.AnchorPoint.Y != 0 ? castnode.ImageCast.AnchorPoint.Y : castnode.ImageCast.Height) / framesize.Y;
-                switch (castnode.ImageCast.Flags & (SWImageCastV2.EFlags)0xFF0000)
+                switch (castnode.ImageCast.Flags & (ISWImageCast.EFlags)0xFF0000)
                 {
-                    case SWImageCastV2.EFlags.eFlags_AnchorBottomRight:
+                    case ISWImageCast.EFlags.eFlags_AnchorBottomRight:
                         Anchor = new Vector2(anchorPoint.X, -anchorPoint.Y);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorBottom:
+                    case ISWImageCast.EFlags.eFlags_AnchorBottom:
                         Anchor = new Vector2(0, -anchorPoint.Y);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorBottomLeft:
+                    case ISWImageCast.EFlags.eFlags_AnchorBottomLeft:
                         Anchor = new Vector2(-anchorPoint.X, -anchorPoint.Y);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorRight:
+                    case ISWImageCast.EFlags.eFlags_AnchorRight:
                         Anchor = new Vector2(anchorPoint.X, 0);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorCenter:
+                    case ISWImageCast.EFlags.eFlags_AnchorCenter:
                         Anchor = new Vector2(0, 0);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorLeft:
+                    case ISWImageCast.EFlags.eFlags_AnchorLeft:
                         Anchor = new Vector2(-anchorPoint.X, 0);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorTopRight:
+                    case ISWImageCast.EFlags.eFlags_AnchorTopRight:
                         Anchor = new Vector2(anchorPoint.X, anchorPoint.Y);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorTop:
+                    case ISWImageCast.EFlags.eFlags_AnchorTop:
                         Anchor = new Vector2(0, anchorPoint.Y);
                         break;
-                    case SWImageCastV2.EFlags.eFlags_AnchorTopLeft:
+                    case ISWImageCast.EFlags.eFlags_AnchorTopLeft:
                         Anchor = new Vector2(-anchorPoint.X, anchorPoint.Y);
                         break;
                     default:
@@ -215,22 +215,22 @@ namespace Shuriken.Models
                 Width = (uint)castnode.ImageCast.Width;
                 Height = (uint)castnode.ImageCast.Height;
 
-                if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_RotateLeft) == SWImageCastV2.EFlags.eFlags_RotateLeft)
+                if ((castnode.ImageCast.Flags & ISWImageCast.EFlags.eFlags_RotateLeft) == ISWImageCast.EFlags.eFlags_RotateLeft)
                 {
                     Width = (uint)castnode.ImageCast.Height;
                     Height = (uint)castnode.ImageCast.Width;
                     Rotation += 90;
                 }
 
-                if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipHorizontally) == SWImageCastV2.EFlags.eFlags_FlipHorizontally)
+                if ((castnode.ImageCast.Flags & ISWImageCast.EFlags.eFlags_FlipHorizontally) == ISWImageCast.EFlags.eFlags_FlipHorizontally)
                 {
                     Scale.X = -Scale.X;
                 }
-                else if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipVertically) == SWImageCastV2.EFlags.eFlags_FlipVertically)
+                else if ((castnode.ImageCast.Flags & ISWImageCast.EFlags.eFlags_FlipVertically) == ISWImageCast.EFlags.eFlags_FlipVertically)
                 {
                     Scale.Y = -Scale.Y;
                 }
-                else if ((castnode.ImageCast.Flags & SWImageCastV2.EFlags.eFlags_FlipHorizontallyAndVertically) == SWImageCastV2.EFlags.eFlags_FlipHorizontallyAndVertically)
+                else if ((castnode.ImageCast.Flags & ISWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically) == ISWImageCast.EFlags.eFlags_FlipHorizontallyAndVertically)
                 {
                     Scale.X = -Scale.X;
                     Scale.Y = -Scale.Y;

@@ -57,7 +57,7 @@ namespace Shuriken.ViewModels
             }
             else if (extension.ToLower() == ".swif")
             {
-                LoadSWIF(filename);
+                LoadSWIF(filename, 2);
             }
         }
 
@@ -124,23 +124,25 @@ namespace Shuriken.ViewModels
             Project.TextureLists.Add(texList);
         }
 
-        public void LoadSWIF(string filename)
+        public void LoadSWIF(string filename, uint version)
         {
             BinaryObjectReader reader = new BinaryObjectReader(filename, Endianness.Little, Encoding.UTF8);
-            reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-            SWIFFileV2 file = reader.ReadObject<SWIFFileV2>();
+            if (version > 1)
+                reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+
+            SWIFFile file = reader.ReadObject<SWIFFile, uint>(version);
 
             string root = Path.GetDirectoryName(Path.GetFullPath(filename));
-            List<SWSceneV2> swScenes = file.Project.ProjectNode.Scenes;
-            List<SWTextureListV2> swTextureLists = file.Project.ProjectNode.TextureLists;
-            List<SWFontListV2> swFontLists = file.Project.ProjectNode.FontLists;
+            var swScenes = file.Project.ProjectNode.Scenes;
+            var swTextureLists = file.TextureList.TextureLists;
+            var swFontLists = file.Project.ProjectNode.FontLists;
 
             Clear();
 
-            foreach (SWTextureListV2 textureList in swTextureLists)
+            foreach (var textureList in swTextureLists)
             {
                 TextureList texList = new TextureList(textureList.Name);
-                foreach (SWTextureV2 texture in textureList.Textures)
+                foreach (SWTexture texture in textureList.Textures)
                 {
                     string texPath = Path.Combine(root, texture.Name + ".dds");
                     if (File.Exists(texPath))
@@ -164,7 +166,7 @@ namespace Shuriken.ViewModels
                 Project.TextureLists.Add(texList);
             }
 
-            foreach (SWFontListV2 fontList in swFontLists)
+            foreach (var fontList in swFontLists)
             {
                 // Implement Texture List Index and Texture Index too here.
                 UIFont font = new UIFont(fontList.Name);
@@ -179,7 +181,7 @@ namespace Shuriken.ViewModels
                 Project.Fonts.Add(font);
             }
 
-            foreach (SWSceneV2 scene in swScenes)
+            foreach (var scene in swScenes)
             {
                 Project.Scenes.Add(new UIScene(file.Project.ProjectNode, scene, scene.Name, Project.TextureLists, Project.Fonts));
             }

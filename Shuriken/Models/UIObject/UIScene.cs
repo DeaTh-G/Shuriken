@@ -62,7 +62,7 @@ namespace Shuriken.Models
             Visible = false;
         }
 
-        public UIScene(SWProjectNodeV2 project, SWSceneV2 scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        public UIScene(SWProjectNode project, ISWScene scene, string sceneName, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
             AspectRatio = scene.FrameSize.X / scene.FrameSize.Y;
@@ -203,7 +203,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void ProcessSWCasts(SWSceneV2 scene, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
+        private void ProcessSWCasts(ISWScene scene, IEnumerable<TextureList> texLists, IEnumerable<UIFont> fonts)
         {
             // Create groups
             for (int g = 0; g < scene.LayerCount; ++g)
@@ -260,7 +260,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void CreateHierarchyTree(int group, List<SWCastNodeV2> casts, List<UICast> lyrs)
+        private void CreateHierarchyTree(int group, List<ISWCastNode> casts, List<UICast> lyrs)
         {
             int next = 0;
             while (next != -1)
@@ -296,7 +296,7 @@ namespace Shuriken.Models
             }
         }
 
-        private void BuildTree(int c, List<SWCastNodeV2> casts, List<UICast> lyrs, UICast parent)
+        private void BuildTree(int c, List<ISWCastNode> casts, List<UICast> lyrs, UICast parent)
         {
             int childIndex = casts[c].ChildIndex;
             if (childIndex != -1)

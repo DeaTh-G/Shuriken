@@ -4,21 +4,21 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF
 {
-    public class SWSceneV2 : IBinarySerializable
+    public class SWSceneV2 : ISWScene
     {
         public string Name { get; set; }
         public uint ID { get; set; }
         public uint Field0C { get; set; }
         public uint Flags { get; set; }
         public uint LayerCount { get; set; }
-        public ulong LayerOffset { get; set; }
-        public ulong CameraCount { get; set; }
-        public ulong CameraOffset { get; set; }
+        public long LayerOffset { get; set; }
+        public long CameraCount { get; set; }
+        public long CameraOffset { get; set; }
         public uint BackgroundColor { get; set; }
-        public Vector2 FrameSize { get; set; }
-        public ulong Field3C { get; set; }
-        public List<SWLayerV2> Layers { get; set; } = new();
-        public List<SWCameraV2> Cameras { get; set; } = new();
+        public Vector2 FrameSize { get; set; } = new();
+        public long Field3C { get; set; }
+        public List<ISWLayer> Layers { get; set; } = new();
+        public List<ISWCamera> Cameras { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
@@ -28,25 +28,25 @@ namespace XNCPLib.SWIF
             Flags = reader.Read<uint>();
 
             LayerCount = reader.Read<uint>();
-            LayerOffset = reader.Read<ulong>();
+            LayerOffset = reader.Read<long>();
 
-            CameraCount = reader.Read<ulong>();
-            CameraOffset = reader.Read<ulong>();
+            CameraCount = reader.Read<long>();
+            CameraOffset = reader.Read<long>();
 
             BackgroundColor = reader.Read<uint>();
 
             FrameSize = new Vector2(reader.Read<float>(), reader.Read<float>());
-            Field3C = reader.Read<ulong>();
+            Field3C = reader.Read<long>();
 
-            reader.ReadAtOffset((long)LayerOffset, () =>
+            reader.ReadAtOffset(LayerOffset, () =>
             {
                 for (int i = 0; i < LayerCount; i++)
                     Layers.Add(reader.ReadObject<SWLayerV2>());
             });
 
-            reader.ReadAtOffset((long)CameraOffset, () =>
+            reader.ReadAtOffset(CameraOffset, () =>
             {
-                for (ulong i = 0; i < CameraCount; i++)
+                for (long i = 0; i < CameraCount; i++)
                     Cameras.Add(reader.ReadObject<SWCameraV2>());
             });
         }
