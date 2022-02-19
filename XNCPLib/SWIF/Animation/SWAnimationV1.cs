@@ -3,18 +3,18 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimationV1 : IBinarySerializable
+    public class SWAnimationV1 : ISWAnimation
     {
         public string Name { get; set; }
         public uint ID { get; set; }
         public uint AnimationLinkCount { get; set; }
-        public uint Field0C { get; set; }
-        public uint AnimationLinkOffset { get; set; }
-        public uint Field14 { get; set; }
-        public byte Field18 { get; set; }
-        public byte Field19 { get; set; }
-        public byte Field1A { get; set; }
-        public byte Field1B { get; set; }
+        public long Field10 { get; set; }
+        public long AnimationLinkOffset { get; set; }
+        public uint Field20 { get; set; }
+        public byte Field24 { get; set; }
+        public byte Field25 { get; set; }
+        public byte Field26 { get; set; }
+        public byte Field27 { get; set; }
         public List<SWAnimationLink> AnimationLinks { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
@@ -24,15 +24,15 @@ namespace XNCPLib.SWIF.Animation
             ID = reader.Read<uint>();
 
             AnimationLinkCount = reader.Read<uint>();
-            Field0C = reader.Read<uint>();
-            AnimationLinkOffset = reader.Read<uint>();
+            Field10 = reader.ReadOffsetValue();
+            AnimationLinkOffset = reader.ReadOffsetValue();
 
-            Field14 = reader.Read<uint>();
+            Field20 = reader.Read<uint>();
 
-            Field18 = reader.Read<byte>();
-            Field19 = reader.Read<byte>();
-            Field1A = reader.Read<byte>();
-            Field1B = reader.Read<byte>();
+            Field24 = reader.Read<byte>();
+            Field25 = reader.Read<byte>();
+            Field26 = reader.Read<byte>();
+            Field27 = reader.Read<byte>();
 
             reader.ReadAtOffset(AnimationLinkOffset, () =>
             {

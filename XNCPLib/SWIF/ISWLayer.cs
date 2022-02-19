@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Amicitia.IO.Binary;
+using XNCPLib.SWIF.Animation;
 using XNCPLib.SWIF.Cast;
 
 namespace XNCPLib.SWIF
@@ -18,5 +19,6 @@ namespace XNCPLib.SWIF
         public uint Field24 { get; set; }
         public List<ISWCastNode> CastNodes { get; set; }
         public List<SWCell> Cells { get; set; }
+        public List<ISWAnimation> Animations { get; set; }
     }
 }

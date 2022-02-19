@@ -19,7 +19,7 @@ namespace XNCPLib.SWIF
         public uint Field24 { get; set; }
         public List<ISWCastNode> CastNodes { get; set; } = new();
         public List<SWCell> Cells { get; set; } = new();
-        public List<SWAnimationV1> Animations { get; set; } = new();
+        public List<ISWAnimation> Animations { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
