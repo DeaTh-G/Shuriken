@@ -8,7 +8,7 @@ namespace XNCPLib.SWIF.Animation
         public string Name { get; set; }
         public uint ID { get; set; }
         public uint AnimationLinkCount { get; set; }
-        public uint Field0C { get; set; }
+        public uint FrameCount { get; set; }
         public uint AnimationLinkOffset { get; set; }
         public uint Field14 { get; set; }
         public byte Field18 { get; set; }
@@ -24,7 +24,7 @@ namespace XNCPLib.SWIF.Animation
             ID = reader.Read<uint>();
 
             AnimationLinkCount = reader.Read<uint>();
-            Field0C = reader.Read<uint>();
+            FrameCount = reader.Read<uint>();
             AnimationLinkOffset = reader.Read<uint>();
 
             Field14 = reader.Read<uint>();

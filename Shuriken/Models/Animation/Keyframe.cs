@@ -47,5 +47,15 @@ namespace Shuriken.Models.Animation
             Offset2 = k.Offset2;
             Field14 = (int)k.Field14;
         }
+
+        public Keyframe(XNCPLib.SWIF.Animation.ISWAnimationTrack t)
+        {
+            Frame = t.Keyframe;
+            KValue = t.Value.Float;
+            Field08 = 0;
+            Offset1 = 0.0f;
+            Offset2 = 0.0f;
+            Field14 = 0;
+        }
     }
 }

@@ -215,14 +215,18 @@ namespace Shuriken.Models
             }
 
             // process group layers
+            int animations = 0;
             List<UICast> tempCasts = new List<UICast>();
             for (int g = 0; g < Groups.Count; ++g)
             {
+                Dictionary<int, int> castIndexMap = new Dictionary<int, int>();
                 for (int c = 0; c < scene.Layers[g].CastCellCount; ++c)
                 {
                     UICast cast = new UICast(scene.Layers[g].CastNodes[c], scene.Layers[g].Cells[c],
                         scene.FrameSize, scene.Layers[g].CastNodes[c].Name, c);
-                    
+
+                    castIndexMap.Add(scene.Layers[g].CastNodes[c].ID, c);
+
                     if (cast.Type == DrawType.Sprite)
                     {
                         for (int index = 0; index < scene.Layers[g].CastNodes[c].ImageCast.PatternInfoCount; ++index)
@@ -239,6 +243,34 @@ namespace Shuriken.Models
                     }
 
                     tempCasts.Add(cast);
+                }
+
+                for (int a = 0; a < scene.Layers[g].AnimationCount; ++a)
+                {
+                    Animations.Add(new AnimationGroup(scene.Layers[g].Animations[a].Name)
+                    {
+                        Duration = scene.Layers[g].Animations[a].FrameCount
+                    });
+
+                    List<AnimationTrack> tracks = new List<AnimationTrack>();
+                    for (int al = 0; al < scene.Layers[g].Animations[a].AnimationLinkCount; al++)
+                    {
+                        for (int t = 0; t < scene.Layers[g].Animations[a].AnimationLinks[al].TimelinesCount; t++)
+                        {
+                            AnimationTrack anim = new AnimationTrack(0);
+                            for (int tr = 0; tr < scene.Layers[g].Animations[a].AnimationLinks[al].Timelines[t].TrackCount; tr++)
+                            {
+                                anim.Keyframes.Add(new Keyframe(scene.Layers[g].Animations[a].AnimationLinks[al].Timelines[t].Tracks[tr]));
+                            }
+
+                            tracks.Add(anim);
+                        }
+
+                        AnimationList layerAnimationList = new AnimationList(tempCasts[castIndexMap[scene.Layers[g].Animations[a].AnimationLinks[al].CastID]], tracks);
+                        Animations[animations].LayerAnimations.Add(layerAnimationList);
+                    }
+
+                    animations++;
                 }
 
                 // build hierarchy tree
