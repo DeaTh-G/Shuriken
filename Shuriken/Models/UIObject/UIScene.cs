@@ -255,12 +255,12 @@ namespace Shuriken.Models
                     List<AnimationTrack> tracks = new List<AnimationTrack>();
                     for (int al = 0; al < scene.Layers[g].Animations[a].AnimationLinkCount; al++)
                     {
-                        for (int t = 0; t < scene.Layers[g].Animations[a].AnimationLinks[al].TimelinesCount; t++)
+                        for (int t = 0; t < scene.Layers[g].Animations[a].AnimationLinks[al].TrackCount; t++)
                         {
                             AnimationTrack anim = new AnimationTrack(0);
-                            for (int tr = 0; tr < scene.Layers[g].Animations[a].AnimationLinks[al].Timelines[t].TrackCount; tr++)
+                            for (int k = 0; k < scene.Layers[g].Animations[a].AnimationLinks[al].Tracks[t].KeyCount; k++)
                             {
-                                anim.Keyframes.Add(new Keyframe(scene.Layers[g].Animations[a].AnimationLinks[al].Timelines[t].Tracks[tr]));
+                                anim.Keyframes.Add(new Keyframe(scene.Layers[g].Animations[a].AnimationLinks[al].Tracks[t].Keys[k]));
                             }
 
                             tracks.Add(anim);

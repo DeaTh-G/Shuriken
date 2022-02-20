@@ -2,11 +2,11 @@
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimationTrackIndividual : ISWAnimationTrack
+    public class SWKeyIndividual : ISWKey
     {
         public int Keyframe { get; set; }
 
-        public ISWAnimationTrack.ValueUnion Value { get; set; }
+        public ISWKey.ValueUnion Value { get; set; }
         public float Field08 { get; set; }
         public float Field0C { get; set; }
         public int Field10 { get; set; }
@@ -15,7 +15,7 @@ namespace XNCPLib.SWIF.Animation
         {
             Keyframe = reader.Read<int>();
 
-            var union = new ISWAnimationTrack.ValueUnion();
+            var union = new ISWKey.ValueUnion();
             switch (Flags & 0xF0)
             {
                 case 0x10:

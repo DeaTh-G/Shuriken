@@ -3,7 +3,7 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Animation
 {
-    public interface ISWAnimationTrack : IBinarySerializable<uint>
+    public interface ISWKey : IBinarySerializable<uint>
     {
         [StructLayout(LayoutKind.Explicit)]
         public struct ValueUnion

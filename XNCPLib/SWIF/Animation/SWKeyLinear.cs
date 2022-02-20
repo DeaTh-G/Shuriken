@@ -2,17 +2,17 @@
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimationTrackConstant : ISWAnimationTrack
+    public class SWKeyLinear : ISWKey
     {
         public int Keyframe { get; set; }
 
-        public ISWAnimationTrack.ValueUnion Value { get; set; }
+        public ISWKey.ValueUnion Value { get; set; } = new();
 
         public void Read(BinaryObjectReader reader, uint Flags)
         {
             Keyframe = reader.Read<int>();
 
-            var union = new ISWAnimationTrack.ValueUnion();
+            var union = new ISWKey.ValueUnion();
             switch (Flags & 0xF0)
             {
                 case 0x10:
@@ -24,17 +24,11 @@ namespace XNCPLib.SWIF.Animation
                 case 0x30:
                     reader.Read(out union.Boolean);
                     break;
+                case 0x40:
+                    reader.Read(out union.Integer);
+                    break;
                 case 0x50:
                     reader.Read(out union.Color);
-                    break;
-                case 0x60:
-                    reader.Read(out union.UnsignedInteger);
-                    break;
-                case 0x70:
-                    reader.Read(out union.Double);
-                    break;
-                case 0x80:
-                    reader.Read(out union.Character);
                     break;
             }
 

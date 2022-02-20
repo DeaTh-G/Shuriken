@@ -6,21 +6,21 @@ namespace XNCPLib.SWIF.Animation
     public class SWAnimationLink : IBinarySerializable
     {
         public ushort CastID { get; set; }
-        public ushort TimelinesCount { get; set; }
-        public uint TimelinesOffset { get; set; }
-        public List<SWAnimationTimeline> Timelines { get; set; } = new(); 
+        public ushort TrackCount { get; set; }
+        public uint TrackOffset { get; set; }
+        public List<SWAnimationTrack> Tracks { get; set; } = new(); 
 
         public void Read(BinaryObjectReader reader)
         {
             CastID = reader.Read<ushort>();
 
-            TimelinesCount = reader.Read<ushort>();
-            TimelinesOffset = reader.Read<uint>();
+            TrackCount = reader.Read<ushort>();
+            TrackOffset = reader.Read<uint>();
 
-            reader.ReadAtOffset(TimelinesOffset, () =>
+            reader.ReadAtOffset(TrackOffset, () =>
             {
-                for (int i = 0; i < TimelinesCount; i++)
-                    Timelines.Add(reader.ReadObject<SWAnimationTimeline>());
+                for (int i = 0; i < TrackCount; i++)
+                    Tracks.Add(reader.ReadObject<SWAnimationTrack>());
             });
         }
 

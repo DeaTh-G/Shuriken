@@ -48,10 +48,10 @@ namespace Shuriken.Models.Animation
             Field14 = (int)k.Field14;
         }
 
-        public Keyframe(XNCPLib.SWIF.Animation.ISWAnimationTrack t)
+        public Keyframe(XNCPLib.SWIF.Animation.ISWKey k)
         {
-            Frame = t.Keyframe;
-            KValue = t.Value.Float;
+            Frame = k.Keyframe;
+            KValue = k.Value.Float;
             Field08 = 0;
             Offset1 = 0.0f;
             Offset2 = 0.0f;

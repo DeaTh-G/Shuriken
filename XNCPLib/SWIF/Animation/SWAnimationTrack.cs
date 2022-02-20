@@ -3,20 +3,20 @@ using Amicitia.IO.Binary;
 
 namespace XNCPLib.SWIF.Animation
 {
-    public class SWAnimationTimeline : IBinarySerializable
+    public class SWAnimationTrack : IBinarySerializable
     {
-        public ushort Field00 { get; set; }
-        public ushort TrackCount { get; set; }
+        public ushort AnimationType { get; set; }
+        public ushort KeyCount { get; set; }
         public uint Flags { get; set; }
         public uint StartFrame { get; set; }
         public uint EndFrame { get; set; }
         public uint TrackOffset { get; set; }
-        public List<ISWAnimationTrack> Tracks { get; set; } = new();
+        public List<ISWKey> Keys { get; set; } = new();
 
         public void Read(BinaryObjectReader reader)
         {
-            Field00 = reader.Read<ushort>();
-            TrackCount = reader.Read<ushort>();
+            AnimationType = reader.Read<ushort>();
+            KeyCount = reader.Read<ushort>();
             Flags = reader.Read<uint>();
             StartFrame = reader.Read<uint>();
             EndFrame = reader.Read<uint>();
@@ -24,21 +24,21 @@ namespace XNCPLib.SWIF.Animation
 
             reader.ReadAtOffset(TrackOffset, () =>
             {
-                for (int i = 0; i < TrackCount; i++)
+                for (int i = 0; i < KeyCount; i++)
                 {
                     switch (Flags & 3)
                     {
                         case 0:
-                            Tracks.Add(reader.ReadObject<SWAnimationTrackConstant, uint>(Flags));
+                            Keys.Add(reader.ReadObject<SWKeyConstant, uint>(Flags));
                             break;
                         case 1:
-                            Tracks.Add(reader.ReadObject<SWAnimationTrackLinear, uint>(Flags));
+                            Keys.Add(reader.ReadObject<SWKeyLinear, uint>(Flags));
                             break;
                         case 2:
-                            Tracks.Add(reader.ReadObject<SWAnimationTrackHermite, uint>(Flags));
+                            Keys.Add(reader.ReadObject<SWKeyHermite, uint>(Flags));
                             break;
                         case 3:
-                            Tracks.Add(reader.ReadObject<SWAnimationTrackIndividual, uint>(Flags));
+                            Keys.Add(reader.ReadObject<SWKeyIndividual, uint>(Flags));
                             break;
                         default:
                             break;
