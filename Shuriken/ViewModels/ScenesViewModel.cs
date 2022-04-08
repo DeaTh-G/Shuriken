@@ -128,6 +128,7 @@ namespace Shuriken.ViewModels
         }
 
         public UIScene SelectedScene { get; set; }
+        public UICastGroup SelectedGroup { get; set; }
         public object ParentNode { get; set; }
         public object SelectedNode { get; set; }
         public ObservableCollection<UIScene> Scenes => Project.Scenes;

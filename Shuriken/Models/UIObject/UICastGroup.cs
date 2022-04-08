@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using XNCPLib.XNCP;
 using System.Runtime.CompilerServices;
+using Shuriken.Models.Animation;
 
 namespace Shuriken.Models
 {
@@ -27,6 +28,7 @@ namespace Shuriken.Models
         public bool Visible { get; set; }
 
         public ObservableCollection<UICast> Casts { get; set; }
+        public ObservableCollection<AnimationGroup> Animations { get; set; }
 
         public void AddCast(UICast cast)
         {
@@ -44,6 +46,7 @@ namespace Shuriken.Models
             Field08 = castGroup.Field08;
             Visible = true;
             Casts = new ObservableCollection<UICast>();
+            Animations = new ObservableCollection<AnimationGroup>();
         }
 
         public UICastGroup(string name = "Group")
@@ -51,6 +54,7 @@ namespace Shuriken.Models
             Name = name;
             Visible = true;
             Casts = new ObservableCollection<UICast>();
+            Animations = new ObservableCollection<AnimationGroup>();
         }
 
         public UICastGroup(UICastGroup g)
@@ -60,6 +64,7 @@ namespace Shuriken.Models
             Visible = true;
 
             Casts = new ObservableCollection<UICast>(g.Casts);
+            Animations = new ObservableCollection<AnimationGroup>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

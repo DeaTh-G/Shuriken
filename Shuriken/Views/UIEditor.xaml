@@ -234,7 +234,7 @@
             
             <!-- Vertical resize splitter [scenes - animations]-->
             <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="5" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Margin="0 2.5" HorizontalAlignment="Stretch"/>
-            <controls:AnimationTimeline Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Animations="{Binding SelectedScene.Animations, Mode=TwoWay}"/>
+            <controls:AnimationTimeline Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Animations="{Binding SelectedGroup.Animations, Mode=TwoWay}"/>
         </Grid>
 
         <!-- Horizontal resize splitter [other controls - properties panel]-->

@@ -20,6 +20,8 @@ namespace Shuriken.Models.Animation
         GradientTL  = 256,
         GradientBL  = 512,
         GradientTR  = 1024,
-        GradientBR  = 2048
+        GradientBR  = 2048,
+        ZPosition = 4096,
+        ZScale = 8192
     }
 }

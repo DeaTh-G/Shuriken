@@ -151,11 +151,9 @@ namespace Shuriken.Models
 
             Anchor = new Vector2(0, 0);
 
-            Offset = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
+            Offset = new Vector2();
 
-            Translation = new Vector2();
-            if (index == 0)
-                Translation = new Vector2(0.5f, 0.5f);
+            Translation = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
             ZTranslation = cell.CellInfo.Position.Z;
 
             Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;

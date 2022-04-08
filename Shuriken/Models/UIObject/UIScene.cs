@@ -39,7 +39,6 @@ namespace Shuriken.Models
 
         public ObservableCollection<Vector2> TextureSizes { get; set; }
         public ObservableCollection<UICastGroup> Groups { get; set; }
-        public ObservableCollection<AnimationGroup> Animations { get; set; }
         public UIScene(Scene scene, string sceneName, TextureList texList, IEnumerable<UIFont> fonts)
         {
             Name = sceneName;
@@ -50,7 +49,6 @@ namespace Shuriken.Models
             AspectRatio = scene.AspectRatio;
             AnimationFramerate = scene.AnimationFramerate;
             TextureSizes = new ObservableCollection<Vector2>();
-            Animations = new ObservableCollection<AnimationGroup>();
             Groups = new ObservableCollection<UICastGroup>();
 
             foreach (var texSize in scene.Data1)
@@ -68,7 +66,6 @@ namespace Shuriken.Models
             AspectRatio = scene.FrameSize.X / scene.FrameSize.Y;
             AnimationFramerate = project.FrameRate;
             TextureSizes = new ObservableCollection<Vector2>();
-            Animations = new ObservableCollection<AnimationGroup>();
             Groups = new ObservableCollection<UICastGroup>();
 
             ProcessSWCasts(scene, texLists, fonts);
@@ -83,7 +80,6 @@ namespace Shuriken.Models
             AnimationFramerate = 60.0f;
             Groups = new ObservableCollection<UICastGroup>();
             TextureSizes = new ObservableCollection<Vector2>();
-            Animations = new ObservableCollection<AnimationGroup>();
 
             Visible = false;
         }
@@ -97,8 +93,6 @@ namespace Shuriken.Models
 
             Groups = new ObservableCollection<UICastGroup>(s.Groups);
             TextureSizes = new ObservableCollection<Vector2>(s.TextureSizes);
-            Animations = new ObservableCollection<AnimationGroup>(s.Animations);
-
 
             Visible = false;
         }
@@ -113,26 +107,23 @@ namespace Shuriken.Models
                     Name = "Group_" + g,
                     Field08 = scene.UICastGroups[g].Field08
                 });
-            }
 
-            // Pre-process animations
-            Dictionary<int, int> entryIndexMap = new Dictionary<int, int>();
-            int animIndex = 0;
-            foreach (var entry in scene.AnimationDictionaries)
-            {
-                Animations.Add(new AnimationGroup(entry.Name)
+                // Pre-process animations
+                Dictionary<int, int> entryIndexMap = new Dictionary<int, int>();
+                int animIndex = 0;
+                foreach (var entry in scene.AnimationDictionaries)
                 {
-                    Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
-                    Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
-                });
+                    Groups[g].Animations.Add(new AnimationGroup(entry.Name)
+                    {
+                        Field00 = scene.AnimationFrameDataList[(int)entry.Index].Field00,
+                        Duration = scene.AnimationFrameDataList[(int)entry.Index].FrameCount
+                    });
 
-                entryIndexMap.Add(animIndex++, (int)entry.Index);
-            }
+                    entryIndexMap.Add(animIndex++, (int)entry.Index);
+                }
 
-            // process group layers
-            List<UICast> tempCasts = new List<UICast>();
-            for (int g = 0; g < Groups.Count; ++g)
-            {
+                // process group layers
+                List<UICast> tempCasts = new List<UICast>();
                 for (int c = 0; c < scene.UICastGroups[g].CastCount; ++c)
                 {
                     UICast cast = new UICast(scene.UICastGroups[g].Casts[c], GetCastName(g, c, scene.CastDictionaries), c);
@@ -191,7 +182,7 @@ namespace Shuriken.Models
                         if (tracks.Count > 0)
                         {
                             AnimationList layerAnimationList = new AnimationList(tempCasts[c], tracks);
-                            Animations[entry.Key].LayerAnimations.Add(layerAnimationList);
+                            Groups[g].Animations[entry.Key].LayerAnimations.Add(layerAnimationList);
                         }
                     }
                 }
@@ -215,7 +206,6 @@ namespace Shuriken.Models
             }
 
             // process group layers
-            int animations = 0;
             List<UICast> tempCasts = new List<UICast>();
             for (int g = 0; g < Groups.Count; ++g)
             {
@@ -245,29 +235,69 @@ namespace Shuriken.Models
                     tempCasts.Add(cast);
                 }
 
-                for (int a = 0; a < scene.Layers[g].AnimationCount; ++a)
+                int animations = 0;
+                foreach (var animation in scene.Layers[g].Animations)
                 {
-                    Animations.Add(new AnimationGroup(scene.Layers[g].Animations[a].Name)
+                    Groups[g].Animations.Add(new AnimationGroup(animation.Name)
                     {
-                        Duration = scene.Layers[g].Animations[a].FrameCount
+                        Duration = animation.FrameCount
                     });
 
-                    List<AnimationTrack> tracks = new List<AnimationTrack>();
-                    for (int al = 0; al < scene.Layers[g].Animations[a].AnimationLinkCount; al++)
+                    foreach (var link in animation.AnimationLinks)
                     {
-                        for (int t = 0; t < scene.Layers[g].Animations[a].AnimationLinks[al].TrackCount; t++)
+                        List<AnimationTrack> tracks = new List<AnimationTrack>();
+                        foreach (var track in link.Tracks)
                         {
-                            AnimationTrack anim = new AnimationTrack(0);
-                            for (int k = 0; k < scene.Layers[g].Animations[a].AnimationLinks[al].Tracks[t].KeyCount; k++)
+                            AnimationType type = AnimationType.None;
+                            switch (track.AnimationType)
                             {
-                                anim.Keyframes.Add(new Keyframe(scene.Layers[g].Animations[a].AnimationLinks[al].Tracks[t].Keys[k]));
+                                case 0:
+                                    type = AnimationType.XPosition;
+                                    break;
+                                case 1:
+                                    type = AnimationType.YPosition;
+                                    break;
+                                case 2:
+                                    type = AnimationType.ZPosition;
+                                    break;
+                                case 6:
+                                    type = AnimationType.XScale;
+                                    break;
+                                case 7:
+                                    type = AnimationType.YScale;
+                                    break;
+                                case 8:
+                                    type = AnimationType.ZScale;
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            AnimationTrack anim = new AnimationTrack(type);
+                            foreach (var key in track.Keys)
+                            {
+                                Keyframe keyframe = new Keyframe(key);
+                                switch (type)
+                                {
+                                    case AnimationType.XPosition:
+                                        keyframe.KValue /= scene.FrameSize.X;
+                                        break;
+                                    case AnimationType.YPosition:
+                                        keyframe.KValue /= -scene.FrameSize.Y;
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                                anim.Keyframes.Add(keyframe);
+                                
                             }
 
                             tracks.Add(anim);
                         }
 
-                        AnimationList layerAnimationList = new AnimationList(tempCasts[castIndexMap[scene.Layers[g].Animations[a].AnimationLinks[al].CastID]], tracks);
-                        Animations[animations].LayerAnimations.Add(layerAnimationList);
+                        AnimationList layerAnimationList = new AnimationList(tempCasts[castIndexMap[link.CastID]], tracks);
+                        Groups[g].Animations[animations].LayerAnimations.Add(layerAnimationList);
                     }
 
                     animations++;
@@ -297,6 +327,7 @@ namespace Shuriken.Models
             int next = 0;
             while (next != -1)
             {
+                lyrs[next].Offset = new Vector2(0.5f, 0.5f);
                 Groups[group].Casts.Add(lyrs[next]);
                 BuildTree(next, casts, lyrs, null);
 

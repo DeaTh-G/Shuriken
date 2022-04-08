@@ -95,20 +95,20 @@ namespace Shuriken.Views
                     renderer.Start();
                     foreach (var lyr in group.Casts)
                     {
-                        UpdateCast(scene, lyr, new CastTransform(), time);
+                        UpdateCast(scene, group, lyr, new CastTransform(), time);
                     }
                     renderer.End();
                 }
             }
         }
 
-        private Vec2 GetPosition(UIScene scn, UICast lyr, float time)
+        private Vec2 GetPosition(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool hasX = false;
             bool hasY = false;
             Vec2 result = new Vec2();
 
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -144,17 +144,39 @@ namespace Shuriken.Views
             return result;
         }
 
-        private float GetZPosition(UIScene scn, UICast lyr, float time)
+        private float GetZPosition(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
-            return lyr.ZTranslation;
+            bool hasZ = false;
+            float result = 0;
+
+            foreach (var anim in group.Animations)
+            {
+                if (anim.Enabled)
+                {
+                    var zPos = anim.GetTrack(lyr, AnimationType.ZPosition);
+                    if (zPos != null)
+                    {
+                        if (zPos.Enabled)
+                        {
+                            result = zPos.GetValue(time);
+                            hasZ = true;
+                        }
+                    }
+                }
+            }
+
+            if (!hasZ)
+                result = lyr.ZTranslation;
+
+            return result;
         }
 
-        private float GetRotation(UIScene scn, UICast lyr, float time)
+        private float GetRotation(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool hasRot = false;
             float result = 0.0f;
 
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -173,14 +195,14 @@ namespace Shuriken.Views
             return hasRot ? result : lyr.Rotation;
         }
 
-        private Vec3 GetScale(UIScene scn, UICast lyr, float time)
+        private Vec3 GetScale(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool hasSx = false;
             bool hasSy = false;
             bool hasSz = false;
             var result = new Vec3(1, 1, 1);
 
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -218,10 +240,10 @@ namespace Shuriken.Views
             return result;
         }
 
-        private int GetSprite(UIScene scn, UICast lyr, float time)
+        private int GetSprite(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             int sprIndex = lyr.DefaultSprite;
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -241,12 +263,12 @@ namespace Shuriken.Views
             return lyr.Sprites[sprIndex];
         }
 
-        private Color GetColor(UIScene scn, UICast lyr, float time)
+        private Color GetColor(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool hasClr = false;
             Color result = new Color(255, 255, 255, 255);
 
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -265,12 +287,12 @@ namespace Shuriken.Views
             return hasClr ? result : lyr.Color;
         }
 
-        private Color[] GetGradients(UIScene scn, UICast lyr, float time)
+        private Color[] GetGradients(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool[] hasGradient = Enumerable.Repeat(false, 4).ToArray();
             Color[] results = new Color[4];
 
-            foreach (var anim in scn.Animations)
+            foreach (var anim in group.Animations)
             {
                 if (anim.Enabled)
                 {
@@ -344,21 +366,21 @@ namespace Shuriken.Views
             return new Vec2(x, y);
         }
 
-        private void UpdateCast(UIScene scene, UICast lyr, CastTransform transform, float time)
+        private void UpdateCast(UIScene scene, UICastGroup group, UICast lyr, CastTransform transform, float time)
         {
-            int sprID = GetSprite(scene, lyr, time);
+            int sprID = GetSprite(scene, group, lyr, time);
 
-            Vec2 position = GetPosition(scene, lyr, time);
+            Vec2 position = GetPosition(scene, group, lyr, time);
             position.X *= renderer.RenderWidth;
             position.Y *= -renderer.RenderHeight;
-            float zPosition = GetZPosition(scene, lyr, time); 
-            float rotation = GetRotation(scene, lyr, time);
-            Vec3 scale = GetScale(scene, lyr, time);
+            float zPosition = GetZPosition(scene, group, lyr, time); 
+            float rotation = GetRotation(scene, group, lyr, time);
+            Vec3 scale = GetScale(scene, group, lyr, time);
 
-            Color color = GetColor(scene, lyr, time);
+            Color color = GetColor(scene, group, lyr, time);
 
             // 0: top-left, 1: bottom-left, 2: top-right, 3: bottom-right
-            Color[] gradients = GetGradients(scene, lyr, time);
+            Color[] gradients = GetGradients(scene, group, lyr, time);
             
             // TODO: figure out position and rotation inheritance flags
             position += transform.Position;
@@ -404,7 +426,7 @@ namespace Shuriken.Views
                         posAdjust.Y = ((lyr.Anchor.Y * scale.Y) - lyr.Anchor.Y) * renderer.RenderHeight;
                     }
 
-                    var childTransform = new CastTransform(position + posAdjust, zPosition, rotation, scale, color); UpdateCast(scene, child, childTransform, time);
+                    var childTransform = new CastTransform(position + posAdjust, zPosition, rotation, scale, color); UpdateCast(scene, group, child, childTransform, time);
                 }
             }
         }
@@ -422,6 +444,7 @@ namespace Shuriken.Views
             {
                 vm.SelectedScene = item == null ? null : item.DataContext as UIScene;
                 vm.SelectedNode = source.DataContext;
+                vm.SelectedGroup = item == null ? null : vm.SelectedNode as UICastGroup;
 
                 TreeViewItem parent = Utilities.GetParentTreeViewItem(source);
                 vm.ParentNode = parent == null ? null : parent.DataContext;
