@@ -269,6 +269,21 @@ namespace Shuriken.Models
                                 case 8:
                                     type = AnimationType.ZScale;
                                     break;
+                                case 17:
+                                    type = AnimationType.SubImage;
+                                    break;
+                                case 21:
+                                    type = AnimationType.ColorRed;
+                                    break;
+                                case 22:
+                                    type = AnimationType.ColorGreen;
+                                    break;
+                                case 23:
+                                    type = AnimationType.ColorBlue;
+                                    break;
+                                case 24:
+                                    type = AnimationType.ColorAlpha;
+                                    break;
                                 default:
                                     break;
                             }

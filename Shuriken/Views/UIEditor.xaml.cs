@@ -287,6 +287,72 @@ namespace Shuriken.Views
             return hasClr ? result : lyr.Color;
         }
 
+        private Color GetColorByChannel(UICastGroup group, UICast lyr, float time)
+        {
+            bool hasR, hasG, hasB, hasA;
+            hasR = hasG = hasB = hasA = false;
+            byte[] result = new byte[4];
+            foreach (var anim in group.Animations)
+            {
+                if (anim.Enabled)
+                {
+                    var colR = anim.GetTrack(lyr, AnimationType.ColorRed);
+                    if (colR != null)
+                    {
+                        if (colR.Enabled)
+                        {
+                            result[0] = (byte)(colR.GetValue(time) * 255);
+                            hasR = true;
+                        }
+                    }
+
+                    var colG = anim.GetTrack(lyr, AnimationType.ColorGreen);
+                    if (colG != null)
+                    {
+                        if (colG.Enabled)
+                        {
+                            result[1] = (byte)(colG.GetValue(time) * 255);
+                            hasG = true;
+                        }
+                    }
+
+                    var colB = anim.GetTrack(lyr, AnimationType.ColorBlue);
+                    if (colB != null)
+                    {
+                        if (colB.Enabled)
+                        {
+                            result[2] = (byte)(colB.GetValue(time) * 255);
+                            hasB = true;
+                        }
+                    }
+
+                    var colA = anim.GetTrack(lyr, AnimationType.ColorAlpha);
+                    if (colA != null)
+                    {
+                        if (colA.Enabled)
+                        {
+                            result[3] = (byte)(colA.GetValue(time) * 255);
+                            hasA = true;
+                        }
+                    }
+                }
+            }
+
+            if (!hasR)
+                result[0] = lyr.Color.R;
+
+            if (!hasG)
+                result[1] = lyr.Color.G;
+
+            if (!hasB)
+                result[2] = lyr.Color.B;
+
+            if (!hasA)
+                result[3] = lyr.Color.A;
+
+            return new Color(result[0], result[1], result[2], result[3]);
+        }
+
         private Color[] GetGradients(UIScene scn, UICastGroup group, UICast lyr, float time)
         {
             bool[] hasGradient = Enumerable.Repeat(false, 4).ToArray();
@@ -377,7 +443,7 @@ namespace Shuriken.Views
             float rotation = GetRotation(scene, group, lyr, time);
             Vec3 scale = GetScale(scene, group, lyr, time);
 
-            Color color = GetColor(scene, group, lyr, time);
+            Color color = GetColorByChannel(group, lyr, time);
 
             // 0: top-left, 1: bottom-left, 2: top-right, 3: bottom-right
             Color[] gradients = GetGradients(scene, group, lyr, time);

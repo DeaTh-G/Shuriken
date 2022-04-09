@@ -38,7 +38,7 @@ namespace Shuriken.Models.Animation
                 float diff = Keyframes[k2].Frame - Keyframes[k1].Frame;
                 float bias = (frame - Keyframes[k1].Frame) / diff;
 
-                return Keyframes[k1].KValue + bias * (Keyframes[k2].KValue - Keyframes[k1].KValue);
+                return BitConverter.SingleToInt32Bits(Keyframes[k1].KValue) + bias * (BitConverter.SingleToInt32Bits(Keyframes[k2].KValue) - BitConverter.SingleToInt32Bits(Keyframes[k1].KValue));
             }
 
             return 0.0f;

@@ -22,6 +22,10 @@ namespace Shuriken.Models.Animation
         GradientTR  = 1024,
         GradientBR  = 2048,
         ZPosition = 4096,
-        ZScale = 8192
+        ZScale = 8192,
+        ColorRed = 16384,
+        ColorGreen = 32768,
+        ColorBlue = 65536,
+        ColorAlpha = 131072
     }
 }

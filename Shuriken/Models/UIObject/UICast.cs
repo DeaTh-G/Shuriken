@@ -156,7 +156,7 @@ namespace Shuriken.Models
             Translation = new Vector2(cell.CellInfo.Position.X / framesize.X, -(cell.CellInfo.Position.Y / framesize.Y));
             ZTranslation = cell.CellInfo.Position.Z;
 
-            Rotation = cell.CellInfo.Rotation * 360 / ushort.MaxValue;
+            Rotation = (cell.CellInfo.Rotation & 0xFFFF) * 360.0f / ushort.MaxValue;
             Scale = new Vector3(cell.CellInfo.Scale.X, cell.CellInfo.Scale.Y, cell.CellInfo.Scale.Z);
             Color = new Color(Utilities.ReverseColor(cell.Color));
             GradientTopLeft = new Color(255, 255, 255, 255);
