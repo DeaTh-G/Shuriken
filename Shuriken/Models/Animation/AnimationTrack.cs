@@ -16,6 +16,8 @@ namespace Shuriken.Models.Animation
         public AnimationType Type { get; }
         public string TypeString => Type.ToString();
         public ObservableCollection<Keyframe> Keyframes { get; set; }
+        public uint Flags { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public float GetValue(float frame)
@@ -38,7 +40,16 @@ namespace Shuriken.Models.Animation
                 float diff = Keyframes[k2].Frame - Keyframes[k1].Frame;
                 float bias = (frame - Keyframes[k1].Frame) / diff;
 
-                return BitConverter.SingleToInt32Bits(Keyframes[k1].KValue) + bias * (BitConverter.SingleToInt32Bits(Keyframes[k2].KValue) - BitConverter.SingleToInt32Bits(Keyframes[k1].KValue));
+                switch (Flags & 0xF0)
+                {
+                    case 0:
+                    case 0x10:
+                    case 0x70:
+                        return Keyframes[k1].KValue + bias * (Keyframes[k2].KValue - Keyframes[k1].KValue);
+                    default:
+                        return BitConverter.SingleToInt32Bits(Keyframes[k1].KValue) + bias * (BitConverter.SingleToInt32Bits(Keyframes[k2].KValue) - BitConverter.SingleToInt32Bits(Keyframes[k1].KValue));
+                }
+
             }
 
             return 0.0f;
@@ -49,10 +60,11 @@ namespace Shuriken.Models.Animation
             Keyframes = new ObservableCollection<Keyframe>(a.Keyframes);
         }
 
-        public AnimationTrack(AnimationType type)
+        public AnimationTrack(AnimationType type, uint flags)
         {
             Type = type;
             Keyframes = new ObservableCollection<Keyframe>();
+            Flags = flags;
         }
     }
 }
