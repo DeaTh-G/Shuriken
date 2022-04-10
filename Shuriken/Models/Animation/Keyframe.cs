@@ -16,12 +16,24 @@ namespace Shuriken.Models.Animation
             get => frame;
             set
             {
-                if (value >= 0)
+                if (value >= 0) 
+                {
                     frame = value;
+                    HasNoFrame = false;
+                }
+                else
+                {
+                    HasNoFrame = true;
+                }
             }
         }
-
+        public bool HasNoFrame { get; set; }
         public float KValue { get; set; }
+        public Color KValueColor
+        {
+            get => new Color(KValue);
+            set => KValue = value.ToUint();
+        }
         public int Field08 { get; set; }
         public float Offset1 { get; set; }
         public float Offset2 { get; set; }
